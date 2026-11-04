@@ -86,6 +86,10 @@ strong{color:var(--ink)}
 .cols.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media (max-width:900px){ .cols.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:520px){ .cols.four{grid-template-columns:1fr} }
+.iana{display:grid; grid-template-columns:minmax(0,14rem) 1fr; gap:22px; align-items:center}
+.iana img{width:100%; border-radius:14px; border:1px solid var(--line); display:block}
+.iana-text{display:flex; flex-direction:column; gap:12px; min-width:0}
+@media (max-width:620px){ .iana{grid-template-columns:1fr} .iana img{max-width:14rem} }
 .panel h3{font-size:var(--step-0); font-family:var(--font-body); font-weight:700; color:var(--accent)}
 .formula{
   font-family:var(--font-display); font-size:var(--step-1); background:var(--accent-soft); border-left:4px solid var(--accent);
@@ -502,18 +506,24 @@ button:disabled{opacity:.4; cursor:default}
   <!-- Monitora -->
   <section class="slide" data-id="monitora" data-section="Retroalimentación">
     <p class="eyebrow">Retroalimentación</p>
-    <h2>Lleven su propuesta a la monitora</h2>
-    <p>Cuando terminen su propuesta, llévenla a una monitora que les preparé para que la revise y les dé una retroalimentación breve. La encuentran en Gemini, y para usarla necesitan una cuenta de Gmail; si alguien no la tiene, puede crearla en pocos minutos.</p>
-    <p>Basta con que una persona del grupo abra la monitora y comparta la pantalla con los demás. En el chat, peguen como texto lo que construyeron en su documento compartido y suban la imagen del modelo:</p>
+    <h2>Les presento a IAna, la monitora del curso</h2>
+    <div class="iana">
+      <img src="fig/iana.jpg" alt="Ilustración de IAna, la monitora del curso: una robot de rasgos humanos, cabello castaño y traje blanco con detalles azules, que sonríe con la mano apoyada en el mentón.">
+      <div class="iana-text">
+        <p>IAna es una inteligencia artificial que les preparé para acompañarlos en este taller. Su nombre une IA y Diana. Cuando terminen su propuesta, llévensela: la va a revisar, les va a contar lo que hicieron bien y les va a hacer preguntas para que descubran lo que todavía pueden mejorar.</p>
+        <p>La encuentran en Gemini, y para usarla necesitan una cuenta de Gmail; si alguien no la tiene, puede crearla en pocos minutos. Basta con que una persona del grupo abra a IAna y comparta la pantalla con los demás.</p>
+      </div>
+    </div>
+    <p>En el chat, peguen como texto lo que construyeron en su documento compartido y suban la imagen del modelo:</p>
     <ul>
       <li>sus historias de usuario, sus reglas de negocio y sus consultas;</li>
       <li>la lista de conceptos con sus características y la lista de relaciones con su cardinalidad, escritas en texto;</li>
       <li>la imagen de su modelo conceptual.</li>
     </ul>
-    <p>Lean con atención su retroalimentación y sigan las indicaciones que les dé.</p>
+    <p>Lean con atención la retroalimentación de IAna y sigan las indicaciones que les dé.</p>
     <div class="actions">
-      <a class="button primary" id="gemLink" href="#" target="_blank" rel="noopener">Ir a la monitora</a>
-      <span class="status" id="gemPending" hidden>El enlace a la monitora estará disponible aquí antes de la sesión.</span>
+      <a class="button primary" id="gemLink" href="#" target="_blank" rel="noopener">Ir a IAna</a>
+      <span class="status" id="gemPending" hidden>El enlace a IAna estará disponible aquí antes de la sesión.</span>
     </div>
   </section>
 
@@ -610,8 +620,8 @@ button:disabled{opacity:.4; cursor:default}
     });
   });
 
-  // Enlace a la monitora (Gem). Pegar aquí la URL del Gem cuando esté creado.
-  var GEM_URL = '';
+  // Enlace a IAna, la monitora (Gem de Gemini).
+  var GEM_URL = 'https://gemini.google.com/gem/1XMV3dZSB96zuvW4E0NJWj1QaK4rj__Ky?usp=sharing';
   var gem = document.getElementById('gemLink');
   if (GEM_URL) { gem.href = GEM_URL; } else { gem.hidden = true; document.getElementById('gemPending').hidden = false; }
 
