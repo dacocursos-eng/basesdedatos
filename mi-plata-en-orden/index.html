@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Taller Mi plata en orden</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+/* Concepto: diapositivas de aula. Una tarjeta amplia por paso, barra de avance arriba y navegación fija abajo; la identidad azul de los anuncios del curso. */
+:root{
+  --bg:#eef2f6;
+  --surface:#ffffff;
+  --surface-2:#f4f7fa;
+  --ink:#24303d;
+  --muted:#5b6878;
+  --line:#c9d7e4;
+  --accent:#236fa1;
+  --accent-ink:#ffffff;
+  --accent-soft:#e3eef7;
+  --slate:#475577;
+  --ok:#24804f;
+  --ok-soft:#e5f3ea;
+  --warn:#a3501c;
+  --warn-soft:#f8ece3;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --step--1:0.9rem;
+  --step-0:1.06rem;
+  --step-1:1.25rem;
+  --step-2:1.6rem;
+  --step-3:2.15rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+    --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+    --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+  --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+  --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:var(--step-0); line-height:1.65;
+  display:flex; flex-direction:column;
+}
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:12px 8px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
+.top-inner{max-width:62rem; margin:0 auto; display:flex; flex-direction:column; gap:8px}
+.top-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.course{font-size:var(--step--1); color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-weight:600}
+.section-name{font-size:var(--step--1); color:var(--accent); font-weight:700}
+.bar{height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease}
+main{
+  flex:1; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:8px 24px;
+}
+.slide{
+  max-width:62rem; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:clamp(22px,4vw,44px); display:flex; flex-direction:column; gap:16px;
+}
+.slide[hidden]{display:none!important}
+.eyebrow{font-size:var(--step--1); letter-spacing:.08em; text-transform:uppercase; color:var(--slate); font-weight:700; margin:0}
+h1,h2,h3{font-family:var(--font-display); color:var(--ink); text-wrap:balance; margin:0; line-height:1.2}
+h1{font-size:var(--step-3); color:var(--accent)}
+h2{font-size:var(--step-2)}
+h3{font-size:var(--step-1); color:var(--slate)}
+p{margin:0; max-width:68ch}
+.lead{font-size:var(--step-1); color:var(--muted); max-width:52ch}
+ul{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:8px; max-width:68ch}
+strong{color:var(--ink)}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:16px}
+.cols > *{min-width:0}
+.panel{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.cols.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){ .cols.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:520px){ .cols.four{grid-template-columns:1fr} }
+.panel h3{font-size:var(--step-0); font-family:var(--font-body); font-weight:700; color:var(--accent)}
+.formula{
+  font-family:var(--font-display); font-size:var(--step-1); background:var(--accent-soft); border-left:4px solid var(--accent);
+  padding:14px 18px; border-radius:6px; max-width:52ch;
+}
+.formula em{color:var(--accent); font-style:normal; font-weight:700}
+.compare{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:14px}
+.compare > div{border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.yes{background:var(--ok-soft); border:1px solid var(--ok)}
+.no{background:var(--warn-soft); border:1px solid var(--warn)}
+.tag{font-size:var(--step--1); font-weight:700; letter-spacing:.04em; text-transform:uppercase}
+.yes .tag{color:var(--ok)} .no .tag{color:var(--warn)}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px}
+table{border-collapse:collapse; width:100%; min-width:34rem; font-size:var(--step--1)}
+th{background:var(--slate); color:var(--surface); text-align:left; padding:8px 12px; font-weight:600}
+td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top}
+.story{border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.story div{display:grid; grid-template-columns:9.5rem 1fr; border-top:1px solid var(--line)}
+.story div:first-child{border-top:0}
+.story b{background:var(--surface-2); color:var(--slate); padding:9px 12px; font-size:var(--step--1)}
+.story span{padding:9px 12px; font-size:var(--step--1); min-width:0}
+@media (max-width:520px){ .story div{grid-template-columns:1fr} }
+.flow{display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; align-items:stretch; list-style:none; padding:0; max-width:none}
+.flow li{flex:1 1 7rem; border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--surface-2); display:flex; flex-direction:column; gap:4px; position:relative}
+.flow li:not(:last-child)::after{content:"\2192"; position:absolute; right:-10px; top:50%; transform:translate(50%,-50%); color:var(--muted); font-weight:700; z-index:1}
+@media (max-width:640px){ .flow{flex-direction:column} .flow li{flex:none} .flow li:not(:last-child)::after{content:"\2193"; right:50%; top:auto; bottom:-10px; transform:translate(50%,50%)} }
+.flow li.here{border-color:var(--accent); background:var(--accent-soft)}
+.flow li small{color:var(--muted); line-height:1.4}
+.flow li b{font-family:var(--font-display); font-size:var(--step-0)}
+.flow .chip{align-self:flex-start; font-size:.75rem; font-weight:700; color:var(--accent-ink); background:var(--accent); padding:1px 8px; border-radius:99px; letter-spacing:.03em}
+.diagram{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px; overflow-x:auto}
+.diagram svg{display:block; min-width:30rem; width:100%; max-width:40rem; height:auto; margin:0 auto}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:var(--step--1); color:var(--muted)}
+.people{display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:16px}
+.person{border:1px solid var(--line); border-radius:12px; padding:18px; display:flex; gap:14px; align-items:flex-start; background:var(--surface-2)}
+.person > div{min-width:0; display:flex; flex-direction:column; gap:4px}
+.avatar{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:1.2rem; background:var(--accent); color:var(--accent-ink)}
+.avatar.alt{background:var(--slate); color:var(--surface)}
+.note{background:var(--accent-soft); border-radius:10px; padding:14px 18px; max-width:68ch}
+.player{border:1px solid var(--accent); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; background:var(--accent-soft)}
+.player h3{font-family:var(--font-body); font-size:var(--step-0); color:var(--accent)}
+.player audio{width:100%}
+.player .missing{font-size:var(--step--1); color:var(--muted)}
+.scenes{display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; max-width:none}
+.scenes li{border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:var(--step--1); background:var(--surface)}
+.checks{list-style:none; padding:0}
+.checks li{display:flex; gap:10px}
+.checks li::before{content:""; flex:none; width:1.05em; height:1.05em; margin-top:.3em; border:2px solid var(--accent); border-radius:4px}
+button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.template{border:1px solid var(--line); border-radius:10px; background:#ffffff; color:#24303d; padding:18px 20px; max-height:24rem; overflow:auto; font-size:var(--step--1)}
+.template p{margin:0 0 8px}
+.template table{min-width:0; font-size:inherit}
+.template th{color:#24303d}
+.tracks{gap:6px}
+.track{display:grid; grid-template-columns:minmax(0,15rem) 1fr; gap:4px 14px; align-items:center; padding:6px 0; border-top:1px solid var(--line)}
+.track:first-child{border-top:0}
+.track span{font-weight:600; font-size:var(--step--1); color:var(--ink)}
+.track audio{width:100%; min-width:0}
+.track .missing{grid-column:2}
+@media (max-width:560px){ .track{grid-template-columns:1fr} .track .missing{grid-column:1} }
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.status{font-size:var(--step--1); color:var(--ok)}
+.sign{display:flex; align-items:center; gap:12px; margin-top:6px}
+.sign .avatar{width:44px; height:44px; font-size:1rem}
+.sign small{display:block; color:var(--muted)}
+.sign b{color:var(--slate)}
+nav.controls{
+  position:sticky; bottom:0; z-index:5; background:var(--bg); border-top:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));
+}
+.controls-inner{max-width:62rem; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:12px}
+button{
+  font:inherit; font-weight:700; border-radius:10px; padding:10px 18px; cursor:pointer; border:2px solid var(--accent);
+  background:var(--surface); color:var(--accent);
+}
+a.button{display:inline-block; text-decoration:none; font-weight:700; border-radius:10px; padding:10px 18px; border:2px solid var(--accent)}
+a.button.primary, button.primary{background:var(--accent); color:var(--accent-ink)}
+button:disabled{opacity:.4; cursor:default}
+.dots{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; flex:1; min-width:0}
+.dots button{width:12px; height:12px; padding:0; border-radius:50%; border:2px solid var(--line); background:var(--surface)}
+.dots button.on{background:var(--accent); border-color:var(--accent)}
+.dots button.done{border-color:var(--accent)}
+@media (max-width:560px){ .dots{display:none} button{padding:10px 14px} }
+@media (prefers-reduced-motion:reduce){ .bar span{transition:none} }
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <span class="course">Bases de Datos · Taller</span>
+      <span class="section-name" id="sectionName">Bienvenida</span>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </div>
+</header>
+
+<main id="slides">
+
+  <!-- Bienvenida -->
+  <section class="slide" data-id="bienvenida" data-section="Bienvenida">
+    <p class="eyebrow">Taller del proyecto</p>
+    <h1>Mi plata en orden</h1>
+    <p class="lead">Del relato de una experta a los requerimientos y el modelo conceptual de una base de datos.</p>
+    <p>Apreciados estudiantes:</p>
+    <p>En este taller van a practicar una tarea central del diseño de bases de datos: escuchar a una persona que conoce muy bien su negocio y convertir lo que cuenta en requerimientos, reglas de negocio, consultas y un primer modelo de la información. Para eso les preparé un caso sobre las finanzas personales, que van a conocer a través de una conversación.</p>
+    <p>Primero repasamos los conceptos que van a necesitar, después les presento el caso y lo que van a construir, les explico cómo organizarse para escuchar y, al final, construyen en grupo su propia propuesta.</p>
+    <div class="note">Para el taller van a necesitar un computador con sonido y una herramienta para dibujar el modelo, como draw.io, Lucidchart o una hoja de papel.</div>
+  </section>
+
+  <!-- Cómo avanza un proyecto -->
+  <section class="slide" data-id="proyecto" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>Cómo avanza un proyecto de bases de datos</h2>
+    <p>Toda base de datos nace de una necesidad. Alguien conoce un negocio, una actividad o un proceso, y necesita guardar, organizar y consultar su información. Quien diseña la base de datos recorre con esa persona un camino por etapas, en el que cada etapa se apoya en la anterior.</p>
+    <p>Estas son las etapas del camino. Las tres resaltadas en azul son las que van a trabajar en este taller.</p>
+    <ul class="flow">
+      <li class="here"><b>Comprender el negocio</b><small>Cómo funciona, quiénes participan, qué ocurre.</small></li>
+      <li class="here"><b>Especificar lo que se necesita</b><small>Requerimientos, reglas de negocio y consultas.</small></li>
+      <li class="here"><b>Modelo conceptual</b><small>Conceptos, características y relaciones.</small></li>
+      <li><b>Modelo lógico</b><small>Entidades, atributos y llaves, en tercera forma normal.</small></li>
+      <li><b>Modelo físico</b><small>Tablas, columnas, tipos de datos e índices para el SGBD elegido.</small></li>
+      <li><b>Implementación</b><small>Creación, poblado y consultas en SQL.</small></li>
+    </ul>
+    <p>Las tres primeras etapas corresponden a la primera entrega del proyecto. En ellas se define <strong>qué información</strong> se necesita; en las siguientes se decide cómo se organiza y cómo se construye. Por eso conviene hacerlas con cuidado: los ajustes en estas etapas se resuelven conversando con la experta, y en las etapas finales implican rehacer modelos y código.</p>
+  </section>
+
+  <!-- Dos expertos -->
+  <section class="slide" data-id="expertos" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>Dos conocimientos que se complementan</h2>
+    <p>En un proyecto real participan, como mínimo, dos tipos de conocimiento, y el diseño se construye en la conversación entre ellos.</p>
+    <div class="cols">
+      <div class="panel">
+        <h3>La persona experta en el negocio</h3>
+        <p>Sabe cómo funciona su mundo, qué necesita la gente, qué condiciones se cumplen siempre y qué preguntas quiere responder. Es quien toma las decisiones sobre el negocio y quien valida si lo que se diseñó corresponde con la realidad.</p>
+      </div>
+      <div class="panel">
+        <h3>La persona experta en bases de datos</h3>
+        <p>Sabe convertir ese conocimiento en una estructura que guarde la información sin repetirla ni perderla, y que permita consultarla. Pregunta, pide ejemplos, repite con sus palabras lo que entendió y deja que la experta la corrija.</p>
+      </div>
+    </div>
+    <p>A esa forma de trabajar la llamamos <strong>levantamiento de requerimientos</strong>. Es exactamente lo que van a escuchar en los audios del caso, y les recomiendo fijarse tanto en lo que se dice como en la forma en que se pregunta.</p>
+  </section>
+
+  <!-- Universo del discurso -->
+  <section class="slide" data-id="universo" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>El universo del discurso</h2>
+    <p>El universo del discurso es la descripción del contexto sobre el que se diseña la base de datos. Reúne todo lo que hay que saber del negocio para poder modelarlo, incluidos los aspectos que parecen más evidentes, porque lo que es obvio para quien vive el negocio rara vez lo es para quien diseña.</p>
+    <p>Recuerden el ejercicio del ser de otro planeta que les propuse en las instrucciones del proyecto: la descripción tiene que ser tan completa que alguien que nunca ha vivido ese mundo pueda entenderlo y participar en él. En nuestro proyecto, el universo del discurso se construye en cuatro partes que se apoyan unas en otras:</p>
+    <div class="cols four">
+      <div class="panel"><h3>Descripción detallada</h3><p>Cómo funciona el negocio de principio a fin, contado con sus propias palabras.</p></div>
+      <div class="panel"><h3>Requerimientos de usuario</h3><p>Lo que cada tipo de usuario necesita hacer, escrito como historias de usuario.</p></div>
+      <div class="panel"><h3>Reglas de negocio</h3><p>Las condiciones que siempre deben cumplir los datos.</p></div>
+      <div class="panel"><h3>Consultas o reportes</h3><p>Las preguntas que la información registrada debe permitir responder.</p></div>
+    </div>
+    <p>En las siguientes diapositivas repasamos las tres últimas, que son las que van a construir en este taller.</p>
+  </section>
+
+  <!-- Requerimientos -->
+  <section class="slide" data-id="requerimientos" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>Los requerimientos funcionales</h2>
+    <p>Los requerimientos funcionales, que en las instrucciones del proyecto aparecen como requerimientos de usuario, expresan lo que cada tipo de usuario necesita hacer con la plataforma. En el curso los escribimos como <strong>historias de usuario</strong>, una forma breve de describir una necesidad desde el punto de vista de quien la tiene:</p>
+    <p class="formula">Como <em>tipo de usuario</em>, quiero <em>lo que necesita hacer</em>, para <em>el propósito que persigue</em>.</p>
+    <p>Los <strong>criterios de aceptación</strong> completan la historia: precisan las condiciones que deben cumplirse para dar por atendida la necesidad, y en una base de datos suelen indicar qué datos se registran y cómo se consultan. Hay dos grandes familias de historias: las de <strong>gestión de la información</strong>, para registrar, actualizar o eliminar datos, y las de <strong>consultas o reportes</strong>, para obtener información a partir de lo registrado. Este es un ejemplo sobre una biblioteca:</p>
+    <div class="story">
+      <div><b>Id</b><span>RU_001</span></div>
+      <div><b>Título</b><span>Registro de préstamos de libros</span></div>
+      <div><b>Descripción</b><span>Como auxiliar de biblioteca, quiero registrar el préstamo de un ejemplar a un usuario, con la fecha del préstamo y la fecha prevista de devolución, para saber qué ejemplares están fuera de la biblioteca y quién los tiene.</span></div>
+      <div><b>Criterios de aceptación</b><span>Es posible registrar el usuario, el ejemplar, la fecha del préstamo y la fecha prevista de devolución. El ejemplar figura como prestado hasta que se registre su devolución.</span></div>
+    </div>
+  </section>
+
+  <!-- Reglas de negocio -->
+  <section class="slide" data-id="reglas" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>Las reglas de negocio</h2>
+    <p>Las reglas de negocio son las condiciones que siempre deben cumplir los datos. Se refieren a los conceptos, a sus características y a sus relaciones: qué valores son posibles, qué datos son obligatorios, qué combinaciones están permitidas. Más adelante se convierten en restricciones del modelo lógico y, al final, en instrucciones del script de creación de la base de datos.</p>
+    <p>Para reconocerlas, comparen estos dos enunciados sobre la misma biblioteca:</p>
+    <div class="compare">
+      <div class="yes"><span class="tag">Regla de negocio</span><p>RN_001: la fecha prevista de devolución de un préstamo es posterior a la fecha del préstamo.</p><p>Es una condición que se puede verificar sobre los datos registrados.</p></div>
+      <div class="no"><span class="tag">Expectativa de comportamiento</span><p>Los usuarios deben cuidar los libros que reciben en préstamo.</p><p>Describe una conducta de las personas, que la base de datos no registra ni puede verificar.</p></div>
+    </div>
+    <p>La pregunta que les ayuda a distinguirlas es esta: <strong>¿puedo comprobar esta condición mirando los datos guardados?</strong> Si la respuesta es sí, tienen una regla de negocio.</p>
+  </section>
+
+  <!-- Consultas -->
+  <section class="slide" data-id="consultas" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>Las consultas o reportes</h2>
+    <p>Las consultas son las preguntas que la información registrada debe permitir responder. Pensar en ellas desde el comienzo les permite comprobar que el modelo guarda todo lo necesario, y en la tercera entrega se convierten en las consultas SQL del proyecto.</p>
+    <p>De cada consulta interesa saber tres cosas: la <strong>pregunta</strong> que responde, <strong>quién la solicita</strong> y con qué <strong>periodicidad</strong>. Las dos últimas muestran para qué sirve la consulta y a quién le aporta. Además, cada consulta se relaciona con el requerimiento del que depende, como en este ejemplo:</p>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Id</th><th>Pregunta</th><th>Solicita</th><th>Periodicidad</th><th>Requerimiento</th></tr>
+        <tr><td>CON_01</td><td>¿Qué ejemplares tienen la devolución vencida y qué usuarios los tienen?</td><td>Coordinación de la biblioteca</td><td>Diaria</td><td>RU_001</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- Modelo conceptual -->
+  <section class="slide" data-id="modelo" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>El modelo conceptual</h2>
+    <p>El modelo conceptual representa la información del universo del discurso. Muestra los <strong>conceptos</strong> del negocio sobre los cuales se necesita guardar información, sus <strong>características</strong>, que son los datos que se registran de cada concepto, y las <strong>relaciones</strong> entre ellos, con su <strong>cardinalidad</strong>, que indica cuántos elementos de un concepto pueden asociarse con un elemento del otro. En el curso lo dibujamos en notación James Martin:</p>
+    <div class="diagram" role="img" aria-label="Ejemplo en notación James Martin: un usuario realiza cero o muchos préstamos y cada préstamo lo realiza un solo usuario.">
+      <svg viewBox="0 0 600 190" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif">
+        <g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)">
+          <rect x="20" y="30" width="170" height="130" rx="8" fill="var(--surface)"/>
+          <line x1="20" y1="66" x2="190" y2="66"/>
+          <rect x="410" y="30" width="170" height="130" rx="8" fill="var(--surface)"/>
+          <line x1="410" y1="66" x2="580" y2="66"/>
+          <line x1="190" y1="95" x2="410" y2="95"/>
+          <line x1="204" y1="83" x2="204" y2="107"/>
+          <line x1="214" y1="83" x2="214" y2="107"/>
+          <circle cx="380" cy="95" r="8" fill="var(--surface)"/>
+          <line x1="392" y1="95" x2="410" y2="80"/>
+          <line x1="392" y1="95" x2="410" y2="110"/>
+        </g>
+        <g fill="var(--ink)" font-size="17">
+          <text x="105" y="54" text-anchor="middle" font-weight="700" fill="var(--accent)">Usuario</text>
+          <text x="34" y="92">documento</text>
+          <text x="34" y="116">nombre</text>
+          <text x="34" y="140">correo</text>
+          <text x="495" y="54" text-anchor="middle" font-weight="700" fill="var(--accent)">Préstamo</text>
+          <text x="424" y="92">fecha</text>
+          <text x="424" y="116">fecha prevista</text>
+          <text x="424" y="140">fecha devolución</text>
+          <text x="300" y="84" text-anchor="middle" fill="var(--muted)" font-size="16">realiza</text>
+        </g>
+      </svg>
+    </div>
+    <div class="legend"><span>Círculo: cero</span><span>Barra: uno</span><span>Pata de gallo: muchos</span></div>
+    <p>Cada extremo de la línea lleva dos símbolos: el más cercano al concepto indica el máximo, y el más alejado, el mínimo. Junto a Préstamo, el círculo y la pata de gallo se leen <em>cero o muchos</em>; junto a Usuario, las dos barras se leen <em>uno y solo uno</em>.</p>
+    <p>Las relaciones se leen en los dos sentidos: <strong>un usuario realiza cero o muchos préstamos, y cada préstamo lo realiza un solo usuario</strong>. Leerlas así en voz alta, en el grupo, es la mejor forma de comprobar que la cardinalidad corresponde con lo que dijo la experta.</p>
+  </section>
+
+  <!-- Cómo escuchar -->
+  <section class="slide" data-id="escuchar" data-section="Los conceptos">
+    <p class="eyebrow">Los conceptos</p>
+    <h2>Cómo escuchar como diseñadores</h2>
+    <p>Cuando una persona explica su negocio, la información llega en forma de relato, con ejemplos y anécdotas, y a ustedes les corresponde organizarla. Estas pistas les ayudan a reconocer cada elemento mientras escuchan:</p>
+    <ul>
+      <li>Las <strong>cosas sobre las que se guarda información</strong>, como personas, documentos, lugares o sucesos, suelen ser conceptos del modelo.</li>
+      <li>Los <strong>datos que se dicen de cada cosa</strong>, como un nombre, una fecha o un valor, suelen ser sus características.</li>
+      <li>Los <strong>verbos que unen dos cosas</strong>, como <em>realiza</em>, <em>tiene</em>, <em>contiene</em> o <em>pertenece a</em>, suelen ser relaciones, y palabras como <em>cada</em>, <em>uno</em>, <em>varios</em>, <em>ninguno</em> o <em>muchos</em> dan pistas sobre la cardinalidad.</li>
+      <li>Expresiones como <em>siempre</em>, <em>solo</em>, <em>nunca</em>, <em>no puede</em> o <em>tiene que</em> suelen anunciar reglas de negocio. Para confirmarlo, háganse la pregunta de la diapositiva de reglas: ¿puedo comprobar esta condición mirando los datos guardados?</li>
+      <li>Lo que la persona <strong>necesita hacer</strong> se convierte en historias de usuario, y lo que <strong>quiere saber</strong>, junto con quién lo pregunta y cada cuánto, en consultas.</li>
+      <li>Cuando la experta <strong>precisa o corrige</strong> algo, anótenlo con atención: allí suele estar una decisión importante del diseño.</li>
+    </ul>
+  </section>
+
+  <!-- El caso -->
+  <section class="slide" data-id="caso" data-section="El caso">
+    <p class="eyebrow">El caso</p>
+    <h2>Una plataforma para poner la plata en orden</h2>
+    <p>Catalina es asesora en finanzas personales y lleva años ayudando a las personas a organizar su dinero. Ninguna de las aplicaciones que les ha recomendado a sus clientes la convence, así que decidió crear su propia plataforma, y para diseñar la base de datos buscó a Julián.</p>
+    <div class="people">
+      <div class="person">
+        <span class="avatar">C</span>
+        <div><h3>Catalina</h3><p>Asesora en finanzas personales. Es la experta del negocio: explica cómo funciona su mundo y decide lo que necesita la plataforma.</p></div>
+      </div>
+      <div class="person">
+        <span class="avatar alt">J</span>
+        <div><h3>Julián</h3><p>Experto en bases de datos. Pregunta, pide ejemplos, repite lo que entendió y organiza la información para el diseño.</p></div>
+      </div>
+    </div>
+    <p>Al final de la conversación, Julián le dice a Catalina que su equipo va a organizar todo lo que ella le enseñó. Ustedes van a cumplir el papel de ese equipo: su tarea es escuchar la conversación y construir, a partir de ella, los requerimientos, las reglas de negocio, las consultas y el modelo conceptual de la plataforma.</p>
+  </section>
+
+  <!-- Construir requerimientos -->
+  <section class="slide" data-id="construir-requerimientos" data-section="Lo que van a construir">
+    <p class="eyebrow">Lo que van a construir</p>
+    <h2>Los requerimientos, las reglas y las consultas</h2>
+    <p>Antes de escuchar, conozcan lo que van a construir. Cuando termine la conversación, con las notas de todos los focos, van a escribir su propuesta en el documento compartido. Escriban todas las historias, reglas y consultas que logren identificar y usen los códigos que vimos en los ejemplos: RU_001 para las historias de usuario, RN_001 para las reglas de negocio y CON_01 para las consultas. Les recomiendo trabajar en este orden, porque cada parte se apoya en la anterior:</p>
+    <ul>
+      <li>Identifiquen los <strong>tipos de usuario</strong> y escriban las <strong>historias de usuario</strong> de cada uno, con su código, su título, su descripción y sus criterios de aceptación. Incluyan historias de gestión de la información y de consultas.</li>
+      <li>Escriban las <strong>reglas de negocio</strong>, cada una con su código, a partir de lo que anotó el foco de reglas.</li>
+      <li>Definan las <strong>consultas</strong>, con su código, la pregunta, quién la solicita, la periodicidad y el requerimiento con el que se relaciona.</li>
+    </ul>
+    <h3>Antes de pasar al modelo, revisen juntos</h3>
+    <ul class="checks">
+      <li>Cada historia de usuario dice quién la necesita, qué quiere hacer y para qué.</li>
+      <li>Cada regla de negocio se puede comprobar mirando los datos guardados.</li>
+      <li>Cada consulta tiene solicitante y periodicidad, y se relaciona con un requerimiento.</li>
+      <li>La información que necesita cada consulta la registra alguna de sus historias de usuario.</li>
+      <li>Lo que Catalina precisó o corrigió durante la conversación quedó reflejado en lo que escribieron.</li>
+    </ul>
+  </section>
+
+  <!-- Construir modelo -->
+  <section class="slide" data-id="construir-modelo" data-section="Lo que van a construir">
+    <p class="eyebrow">Lo que van a construir</p>
+    <h2>El modelo conceptual</h2>
+    <p>Con los requerimientos, las reglas y las consultas listos, van a representar esa información en un modelo conceptual en notación James Martin. Les sugiero empezar con una lista de los conceptos y sus características, después definir las relaciones con su cardinalidad, y solo entonces dibujar el diagrama. Pueden hacerlo en draw.io, en Lucidchart o en papel; si lo hacen en papel, tómenle una foto legible para pegarla en su documento.</p>
+    <h3>Mientras lo construyen, pregúntense</h3>
+    <ul class="checks">
+      <li>Cada concepto representa algo sobre lo que Catalina necesita guardar información, y tiene sus características.</li>
+      <li>Cada relación se puede leer en los dos sentidos, en voz alta, y lo que dice corresponde con lo que explicó Catalina.</li>
+      <li>Cuando un dato depende a la vez de dos conceptos, el grupo discutió dónde ubicarlo.</li>
+      <li>Para cada consulta, pueden recorrer el modelo y encontrar todos los datos que necesita.</li>
+      <li>Las reglas de negocio que hablan de cuántos, como <em>solo uno</em> o <em>al menos uno</em>, se ven en las cardinalidades.</li>
+    </ul>
+    <p>Si en el grupo surgen dos alternativas, discútanlas con los argumentos de lo que dijo Catalina y elijan una. Decidir entre alternativas es parte del trabajo de diseño.</p>
+  </section>
+
+  <!-- Organizarse -->
+  <section class="slide" data-id="organizarse" data-section="Antes de escuchar">
+    <p class="eyebrow">Antes de escuchar</p>
+    <h2>Organícense para escuchar</h2>
+    <p>La conversación tiene mucha información, y escucharla con un propósito claro les va a facilitar el trabajo. Les propongo repartir la escucha en el grupo, de modo que cada integrante se haga cargo de un foco:</p>
+    <div class="cols four">
+      <div class="panel"><h3>Usuarios y necesidades</h3><p>Quiénes usan la plataforma y qué necesita hacer cada uno.</p></div>
+      <div class="panel"><h3>Reglas</h3><p>Las condiciones que siempre deben cumplir los datos.</p></div>
+      <div class="panel"><h3>Preguntas</h3><p>Lo que se quiere consultar, quién lo pregunta y cada cuánto.</p></div>
+      <div class="panel"><h3>Conceptos y características</h3><p>Las cosas de las que se guarda información, sus datos y cómo se relacionan.</p></div>
+    </div>
+    <p>Si el grupo es más pequeño, combinen focos, y si desarrollan el taller por su cuenta, asuman todos los focos. Todos escuchan la conversación completa, y cada uno anota con más detalle lo de su foco.</p>
+    <p>Les recomiendo que una persona del grupo reproduzca los audios para todos, compartiendo el sonido, para que el grupo escuche al mismo ritmo y pueda detenerse a comparar.</p>
+  </section>
+
+  <!-- Documento compartido -->
+  <section class="slide" data-id="documento" data-section="Antes de escuchar">
+    <p class="eyebrow">Antes de escuchar</p>
+    <h2>Preparen su documento compartido</h2>
+    <p>Antes de escuchar, preparen el documento en el que el grupo va a tomar notas y construir su propuesta. Una persona lo crea en Google Docs o en Word en línea, pega el formato que les dejo aquí abajo y comparte el enlace con los demás, con permiso para editar. Así cada integrante escribe en su foco mientras escucha, y al final todos trabajan sobre el mismo documento.</p>
+    <p>El formato tiene tres partes: la comprensión del negocio, las notas de la conversación, organizadas por foco, y la propuesta del grupo, con las tablas para las historias de usuario, las reglas de negocio, las consultas y el modelo conceptual. Al pegarlo, las tablas se conservan.</p>
+    <p>Este formato es una propuesta. Si encuentran otra forma de organizarse que les funcione mejor como grupo, siéntanse en libertad de usarla.</p>
+    <div class="actions">
+      <button type="button" class="primary" id="copyTemplate">Copiar el formato</button>
+      <span class="status" id="copyStatus" role="status"></span>
+    </div>
+    <div class="template" id="plantilla">
+<h1 style="font-size:18pt; color:#236fa1; margin:0 0 8px">Taller Mi plata en orden: notas y propuesta del grupo</h1>
+<h2 style="font-size:15pt; color:#236fa1; margin:16px 0 6px">Integrantes y foco de escucha</h2>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Integrante</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Foco</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h2 style="font-size:15pt; color:#236fa1; margin:16px 0 6px">Comprensión del negocio</h2>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">¿Qué son las finanzas personales y cuáles son las piezas que las componen?</h3>
+<p>&nbsp;</p>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">¿Qué significa gestionarlas, y por qué Catalina dice que es un ciclo?</h3>
+<p>&nbsp;</p>
+<h2 style="font-size:15pt; color:#236fa1; margin:16px 0 6px">Notas de la conversación</h2>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Usuarios y necesidades</h3>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Tipo de usuario</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Lo que necesita hacer</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Reglas</h3>
+<p>Condiciones que escucharon con palabras como cada, solo, siempre, nunca, no puede o tiene que.</p>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Preguntas</h3>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Pregunta</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Quién la hace</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Cada cuánto</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Conceptos y características</h3>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Concepto</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Características</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Relaciones</h3>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Concepto</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Relación (verbo)</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Concepto relacionado</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Cardinalidad, leída en los dos sentidos</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Dudas y decisiones del grupo</h3>
+<p>&nbsp;</p>
+<h2 style="font-size:15pt; color:#236fa1; margin:16px 0 6px">Propuesta del grupo</h2>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Historias de usuario</h3>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Id</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Título</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Descripción</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Criterios de aceptación</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Reglas de negocio</h3>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Id</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Regla</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Consultas</h3>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Id</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Pregunta</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Solicita</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Periodicidad</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Requerimiento</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">Modelo conceptual</h3>
+<p>Conceptos con sus características:</p>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Concepto</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Características</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<p>Relaciones entre conceptos, con su cardinalidad:</p>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Concepto</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Relación (verbo)</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Concepto relacionado</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Cardinalidad, leída en los dos sentidos</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px; vertical-align:top">&nbsp;</td></tr></table>
+<p>Imagen del modelo en notación James Martin:</p>
+<p>&nbsp;</p>
+    </div>
+  </section>
+
+  <!-- Primer momento -->
+  <section class="slide" data-id="momento-entender" data-section="La conversación">
+    <p class="eyebrow">La conversación</p>
+    <h2>Primer momento: entender las finanzas personales</h2>
+    <p>Escuchen este primer momento con el propósito de <strong>entender el negocio</strong>. Lo que aprendan aquí les va a dar el vocabulario para todo lo que sigue.</p>
+    <div class="player">
+      <h3>Audio del primer momento</h3>
+      <audio controls preload="none" src="audio/momento_entender.mp3"></audio>
+      <p class="missing" hidden>El audio todavía no está disponible en esta página.</p>
+    </div>
+    <p>Cuando terminen, respondan juntos estas dos preguntas con sus propias palabras, en el apartado de comprensión del negocio de su documento:</p>
+    <ul>
+      <li>¿Qué son las finanzas personales y cuáles son las piezas que las componen?</li>
+      <li>¿Qué significa gestionarlas, y por qué Catalina dice que es un ciclo?</li>
+    </ul>
+  </section>
+
+  <!-- Segundo momento -->
+  <section class="slide" data-id="momento-levantamiento" data-section="La conversación">
+    <p class="eyebrow">La conversación</p>
+    <h2>Segundo momento: el levantamiento de requerimientos</h2>
+    <p>Aquí empieza el trabajo de cada foco. La conversación está dividida en audios cortos: al terminar cada uno, tómense el tiempo de comparar lo que anotaron y completar sus notas antes de seguir con el siguiente.</p>
+    <div class="player tracks">
+      <div class="track"><span>Quiénes usan la plataforma</span><audio controls preload="none" src="audio/levantamiento_01_usuarios.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+      <div class="track"><span>Dónde está la plata</span><audio controls preload="none" src="audio/levantamiento_02_donde_esta_la_plata.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+      <div class="track"><span>Cómo se mueve la plata</span><audio controls preload="none" src="audio/levantamiento_03_como_se_mueve_la_plata.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+      <div class="track"><span>Etiquetas, gastos hormiga y traslados</span><audio controls preload="none" src="audio/levantamiento_04_etiquetas_y_traslados.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+      <div class="track"><span>La tarjeta de crédito</span><audio controls preload="none" src="audio/levantamiento_05_tarjeta_de_credito.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+      <div class="track"><span>El presupuesto y los pagos fijos</span><audio controls preload="none" src="audio/levantamiento_06_presupuesto_y_pagos_fijos.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+      <div class="track"><span>Las metas de ahorro y el panorama completo</span><audio controls preload="none" src="audio/levantamiento_07_metas_y_patrimonio.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+      <div class="track"><span>Las preguntas que la plataforma debe responder</span><audio controls preload="none" src="audio/levantamiento_08_preguntas.mp3"></audio><p class="missing" hidden>El audio todavía no está disponible en esta página.</p></div>
+    </div>
+    <p>Cuando terminen el último audio, construyan su propuesta en el documento compartido, como vimos antes de escuchar, y luego continúen con la siguiente diapositiva.</p>
+  </section>
+
+
+
+
+  <!-- Monitora -->
+  <section class="slide" data-id="monitora" data-section="Retroalimentación">
+    <p class="eyebrow">Retroalimentación</p>
+    <h2>Lleven su propuesta a la monitora</h2>
+    <p>Cuando terminen su propuesta, llévenla a una monitora que les preparé para que la revise y les dé una retroalimentación breve. La encuentran en Gemini, y para usarla necesitan una cuenta de Gmail; si alguien no la tiene, puede crearla en pocos minutos.</p>
+    <p>Basta con que una persona del grupo abra la monitora y comparta la pantalla con los demás. En el chat, peguen como texto lo que construyeron en su documento compartido y suban la imagen del modelo:</p>
+    <ul>
+      <li>sus historias de usuario, sus reglas de negocio y sus consultas;</li>
+      <li>la lista de conceptos con sus características y la lista de relaciones con su cardinalidad, escritas en texto;</li>
+      <li>la imagen de su modelo conceptual.</li>
+    </ul>
+    <p>Lean con atención su retroalimentación y sigan las indicaciones que les dé.</p>
+    <div class="actions">
+      <a class="button primary" id="gemLink" href="#" target="_blank" rel="noopener">Ir a la monitora</a>
+      <span class="status" id="gemPending" hidden>El enlace a la monitora estará disponible aquí antes de la sesión.</span>
+    </div>
+  </section>
+
+
+
+  <!-- Cierre -->
+  <section class="slide" data-id="cierre" data-section="Cierre">
+    <p class="eyebrow">Cierre</p>
+    <h2>Para continuar</h2>
+    <p>Llegaron al final del taller. Si están desarrollando el taller por su cuenta, sigan también las indicaciones del anuncio del curso.</p>
+    <p>Lo que construyeron en este taller es el mismo trabajo que van a hacer en la primera entrega del proyecto con su plataforma de eventos y networking: escuchar, preguntar, organizar y modelar. Les recomiendo guardar sus notas y su propuesta, porque les van a servir como referencia.</p>
+    <p>Quedo atenta a sus preguntas.</p>
+    <div class="sign"><span class="avatar">DA</span><div><small>Saludos,</small><b>Diana Angélica</b></div></div>
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Navegación del taller">
+  <div class="controls-inner">
+    <button type="button" id="prev">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" class="primary" id="next">Siguiente</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var bar = document.getElementById('bar');
+  var dots = document.getElementById('dots');
+  var sectionName = document.getElementById('sectionName');
+  var current = 0;
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+
+  slides.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', s.querySelector('h1,h2').textContent);
+    b.addEventListener('click', function(){ go(i, true); });
+    dots.appendChild(b);
+  });
+
+  function go(i, focus){
+    if (i < 0 || i >= slides.length) return;
+    current = i;
+    slides.forEach(function(s, j){ s.hidden = j !== i; });
+    Array.prototype.forEach.call(dots.children, function(d, j){
+      d.classList.toggle('on', j === i);
+      d.classList.toggle('done', j < i);
+      if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    sectionName.textContent = slides[i].getAttribute('data-section');
+    var id = slides[i].getAttribute('data-id');
+    if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch(e){ location.hash = id; } }
+    store.set('taller-plata-diapositiva', id);
+    window.scrollTo(0, 0);
+    if (focus) { var h = slides[i].querySelector('h1,h2'); h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  }
+  function indexOf(id){
+    for (var i = 0; i < slides.length; i++) if (slides[i].getAttribute('data-id') === id) return i;
+    return -1;
+  }
+
+  prev.addEventListener('click', function(){ go(current - 1, true); });
+  next.addEventListener('click', function(){ go(current + 1, true); });
+  document.addEventListener('keydown', function(e){
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'AUDIO')) return;
+    if (e.key === 'ArrowRight') go(current + 1, true);
+    if (e.key === 'ArrowLeft') go(current - 1, true);
+  });
+  window.addEventListener('hashchange', function(){
+    var i = indexOf(location.hash.slice(1));
+    if (i >= 0 && i !== current) go(i, false);
+  });
+
+  var start = indexOf(location.hash.slice(1));
+  if (start < 0) start = indexOf(store.get('taller-plata-diapositiva') || '');
+  go(start < 0 ? 0 : start, false);
+
+  // Audios: si el archivo no existe, se muestra un aviso.
+  Array.prototype.forEach.call(document.querySelectorAll('.player audio'), function(a){
+    a.addEventListener('error', function(){
+      a.hidden = true;
+      var m = a.parentNode.querySelector('.missing');
+      if (m) m.hidden = false;
+    });
+  });
+
+  // Enlace a la monitora (Gem). Pegar aquí la URL del Gem cuando esté creado.
+  var GEM_URL = '';
+  var gem = document.getElementById('gemLink');
+  if (GEM_URL) { gem.href = GEM_URL; } else { gem.hidden = true; document.getElementById('gemPending').hidden = false; }
+
+  // Copia del formato del documento compartido
+  var status = document.getElementById('copyStatus');
+  var tpl = document.getElementById('plantilla');
+  document.getElementById('copyTemplate').addEventListener('click', function(){
+    var html = tpl.innerHTML, text = tpl.innerText;
+    function done(){ status.textContent = 'Formato copiado. Péguenlo en su documento.'; }
+    function fallback(){
+      var r = document.createRange(); r.selectNodeContents(tpl);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = false; try { ok = document.execCommand('copy'); } catch(e){}
+      if (ok) { sel.removeAllRanges(); done(); }
+      else { status.textContent = 'El formato quedó seleccionado; cópienlo con Ctrl+C o Cmd+C.'; }
+    }
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        var item = new ClipboardItem({
+          'text/html': new Blob([html], {type:'text/html'}),
+          'text/plain': new Blob([text], {type:'text/plain'})
+        });
+        navigator.clipboard.write([item]).then(done, fallback);
+      } else { fallback(); }
+    } catch(e){ fallback(); }
+  });
+})();
+</script>
+</body>
+</html>

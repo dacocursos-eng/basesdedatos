@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>La solución de Julián</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+/* Concepto: diapositivas de aula. Una tarjeta amplia por paso, barra de avance arriba y navegación fija abajo; la identidad azul de los anuncios del curso. */
+:root{
+  --bg:#eef2f6;
+  --surface:#ffffff;
+  --surface-2:#f4f7fa;
+  --ink:#24303d;
+  --muted:#5b6878;
+  --line:#c9d7e4;
+  --accent:#236fa1;
+  --accent-ink:#ffffff;
+  --accent-soft:#e3eef7;
+  --slate:#475577;
+  --ok:#24804f;
+  --ok-soft:#e5f3ea;
+  --warn:#a3501c;
+  --warn-soft:#f8ece3;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --step--1:0.9rem;
+  --step-0:1.06rem;
+  --step-1:1.25rem;
+  --step-2:1.6rem;
+  --step-3:2.15rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+    --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+    --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+  --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+  --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:var(--step-0); line-height:1.65;
+  display:flex; flex-direction:column;
+}
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:12px 8px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
+.top-inner{max-width:62rem; margin:0 auto; display:flex; flex-direction:column; gap:8px}
+.top-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.course{font-size:var(--step--1); color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-weight:600}
+.section-name{font-size:var(--step--1); color:var(--accent); font-weight:700}
+.bar{height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease}
+main{
+  flex:1; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:8px 24px;
+}
+.slide{
+  max-width:62rem; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:clamp(22px,4vw,44px); display:flex; flex-direction:column; gap:16px;
+}
+.slide[hidden]{display:none!important}
+.eyebrow{font-size:var(--step--1); letter-spacing:.08em; text-transform:uppercase; color:var(--slate); font-weight:700; margin:0}
+h1,h2,h3{font-family:var(--font-display); color:var(--ink); text-wrap:balance; margin:0; line-height:1.2}
+h1{font-size:var(--step-3); color:var(--accent)}
+h2{font-size:var(--step-2)}
+h3{font-size:var(--step-1); color:var(--slate)}
+p{margin:0; max-width:68ch}
+.lead{font-size:var(--step-1); color:var(--muted); max-width:52ch}
+ul{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:8px; max-width:68ch}
+strong{color:var(--ink)}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:16px}
+.cols > *{min-width:0}
+.panel{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.cols.five{grid-template-columns:repeat(6,minmax(0,1fr))}
+.cols.five > *{grid-column:span 2}
+.cols.five > :nth-child(n+4){grid-column:span 3}
+@media (max-width:900px){ .cols.five{grid-template-columns:repeat(2,minmax(0,1fr))} .cols.five > *, .cols.five > :nth-child(n+4){grid-column:auto} .cols.five > :last-child{grid-column:1 / -1} }
+@media (max-width:520px){ .cols.five{grid-template-columns:1fr} }
+.panel h3{font-size:var(--step-0); font-family:var(--font-body); font-weight:700; color:var(--accent)}
+.formula{
+  font-family:var(--font-display); font-size:var(--step-1); background:var(--accent-soft); border-left:4px solid var(--accent);
+  padding:14px 18px; border-radius:6px; max-width:52ch;
+}
+.formula em{color:var(--accent); font-style:normal; font-weight:700}
+.compare{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:14px}
+.compare > div{border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.yes{background:var(--ok-soft); border:1px solid var(--ok)}
+.no{background:var(--warn-soft); border:1px solid var(--warn)}
+.tag{font-size:var(--step--1); font-weight:700; letter-spacing:.04em; text-transform:uppercase}
+.yes .tag{color:var(--ok)} .no .tag{color:var(--warn)}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px}
+table{border-collapse:collapse; width:100%; min-width:34rem; font-size:var(--step--1)}
+th{background:var(--slate); color:var(--surface); text-align:left; padding:8px 12px; font-weight:600}
+td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top}
+.story{border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.story div{display:grid; grid-template-columns:9.5rem 1fr; border-top:1px solid var(--line)}
+.story div:first-child{border-top:0}
+.story b{background:var(--surface-2); color:var(--slate); padding:9px 12px; font-size:var(--step--1)}
+.story span{padding:9px 12px; font-size:var(--step--1); min-width:0}
+@media (max-width:520px){ .story div{grid-template-columns:1fr} }
+.flow{display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; align-items:stretch; list-style:none; padding:0; max-width:none}
+.flow li{flex:1 1 7rem; border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--surface-2); display:flex; flex-direction:column; gap:4px; position:relative}
+.flow li:not(:last-child)::after{content:"\2192"; position:absolute; right:-10px; top:50%; transform:translate(50%,-50%); color:var(--muted); font-weight:700; z-index:1}
+@media (max-width:640px){ .flow{flex-direction:column} .flow li{flex:none} .flow li:not(:last-child)::after{content:"\2193"; right:50%; top:auto; bottom:-10px; transform:translate(50%,50%)} }
+.flow li.here{border-color:var(--accent); background:var(--accent-soft)}
+.flow li small{color:var(--muted); line-height:1.4}
+.flow li b{font-family:var(--font-display); font-size:var(--step-0)}
+.flow .chip{align-self:flex-start; font-size:.75rem; font-weight:700; color:var(--accent-ink); background:var(--accent); padding:1px 8px; border-radius:99px; letter-spacing:.03em}
+.diagram{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px; overflow-x:auto}
+.diagram svg{display:block; min-width:30rem; width:100%; max-width:40rem; height:auto; margin:0 auto}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:var(--step--1); color:var(--muted)}
+.people{display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:16px}
+.person{border:1px solid var(--line); border-radius:12px; padding:18px; display:flex; gap:14px; align-items:flex-start; background:var(--surface-2)}
+.person > div{min-width:0; display:flex; flex-direction:column; gap:4px}
+.avatar{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:1.2rem; background:var(--accent); color:var(--accent-ink)}
+.avatar.alt{background:var(--slate); color:var(--surface)}
+.note{background:var(--accent-soft); border-radius:10px; padding:14px 18px; max-width:68ch}
+.player{border:1px solid var(--accent); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; background:var(--accent-soft)}
+.player h3{font-family:var(--font-body); font-size:var(--step-0); color:var(--accent)}
+.player audio{width:100%}
+.player .missing{font-size:var(--step--1); color:var(--muted)}
+.scenes{display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; max-width:none}
+.scenes li{border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:var(--step--1); background:var(--surface)}
+.checks{list-style:none; padding:0}
+.checks li{display:flex; gap:10px}
+.checks li::before{content:""; flex:none; width:1.05em; height:1.05em; margin-top:.3em; border:2px solid var(--accent); border-radius:4px}
+button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.template{border:1px solid var(--line); border-radius:10px; background:#ffffff; color:#24303d; padding:18px 20px; max-height:24rem; overflow:auto; font-size:var(--step--1)}
+.template p{margin:0 0 8px}
+.template table{min-width:0; font-size:inherit}
+.template th{color:#24303d}
+.diagram.figure{background:#ffffff; padding:12px}
+.diagram.figure img{display:block; width:100%; min-width:56rem; height:auto}
+.caption{font-size:var(--step--1); color:var(--muted)}
+.caption a, .note a{color:var(--accent)}
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.status{font-size:var(--step--1); color:var(--ok)}
+.sign{display:flex; align-items:center; gap:12px; margin-top:6px}
+.sign .avatar{width:44px; height:44px; font-size:1rem}
+.sign small{display:block; color:var(--muted)}
+.sign b{color:var(--slate)}
+nav.controls{
+  position:sticky; bottom:0; z-index:5; background:var(--bg); border-top:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));
+}
+.controls-inner{max-width:62rem; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:12px}
+button{
+  font:inherit; font-weight:700; border-radius:10px; padding:10px 18px; cursor:pointer; border:2px solid var(--accent);
+  background:var(--surface); color:var(--accent);
+}
+a.button{display:inline-block; text-decoration:none; font-weight:700; border-radius:10px; padding:10px 18px; border:2px solid var(--accent)}
+a.button.primary, button.primary{background:var(--accent); color:var(--accent-ink)}
+button:disabled{opacity:.4; cursor:default}
+.dots{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; flex:1; min-width:0}
+.dots button{width:12px; height:12px; padding:0; border-radius:50%; border:2px solid var(--line); background:var(--surface)}
+.dots button.on{background:var(--accent); border-color:var(--accent)}
+.dots button.done{border-color:var(--accent)}
+@media (max-width:560px){ .dots{display:none} button{padding:10px 14px} }
+@media (prefers-reduced-motion:reduce){ .bar span{transition:none} }
+</style>
+
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <span class="course">Bases de Datos · Taller</span>
+      <span class="section-name" id="sectionName">Bienvenida</span>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </div>
+</header>
+
+<main id="slides">
+
+  <!-- Bienvenida -->
+  <section class="slide" data-id="bienvenida" data-section="Bienvenida">
+    <p class="eyebrow">Retroalimentación del taller</p>
+    <h1>Cómo lo resolvieron Catalina y Julián</h1>
+    <p class="lead">La validación de los requerimientos y del modelo conceptual de la plataforma.</p>
+    <p>Apreciados estudiantes:</p>
+    <p>Después de la conversación que escucharon en el taller, Julián volvió a reunirse dos veces con Catalina: primero para validar con ella los requerimientos y después para validar el primer modelo conceptual. En esta parte van a escuchar esas dos reuniones y a comparar su propuesta con la de Julián.</p>
+    <p>La solución de Julián es una forma de resolver el caso. Cuando su propuesta sea distinta, la referencia para decidir es lo que dijo Catalina: una alternativa que corresponde con lo que ella explicó y que permite responder sus preguntas también es una buena solución.</p>
+    <div class="note">Si llegaron aquí sin haber desarrollado el taller, les recomiendo hacerlo primero en <a href="index.html">la página del taller</a>, para que tengan su propia propuesta con la cual comparar.</div>
+  </section>
+
+  <!-- Cómo comparar -->
+  <section class="slide" data-id="comparar" data-section="Antes de escuchar">
+    <p class="eyebrow">Antes de escuchar</p>
+    <h2>Cómo van a comparar</h2>
+    <p>Tengan abierto su documento compartido con la propuesta del grupo y agreguen al final un apartado de comparación. Les dejo un formato que pueden copiar y pegar, y como en el taller, son libres de organizarse de otra forma.</p>
+    <p>Mientras escuchan, cada vez que Julián presente un requerimiento, una regla, una consulta, un concepto o una relación, búsquenlo en su propuesta y anoten si coincide, si les faltó o si lo resolvieron de otra manera. Presten especial atención a los momentos en que Catalina corrige a Julián: revisen si su propuesta tenía la misma situación. Como en el taller, una persona del grupo reproduce el audio para todos y lo pausa cuando necesiten anotar.</p>
+    <p>Al terminar, respondan juntos las tres preguntas del final del formato. Si trabajan por su cuenta, hagan la comparación de manera individual.</p>
+    <div class="actions">
+      <button type="button" class="primary" id="copyTemplate">Copiar el formato</button>
+      <span class="status" id="copyStatus" role="status"></span>
+    </div>
+    <div class="template" id="plantilla">
+<h2 style="font-size:15pt; color:#236fa1; margin:16px 0 6px">Comparación con la propuesta de Julián</h2>
+<table style="border-collapse:collapse; width:100%; margin:4px 0 12px"><tr><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Elemento</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Lo que propusimos</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Lo que propuso Julián</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Coincide, nos faltó o es distinto</th><th style="border:1px solid #9fb3c8; padding:6px 8px; background:#e3eef7; text-align:left">Por qué</th></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td></tr><tr><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td><td style="border:1px solid #9fb3c8; padding:6px 8px">&nbsp;</td></tr></table>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">¿Qué decisiones tomaron igual que Julián y con qué argumentos?</h3>
+<p>&nbsp;</p>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">¿Qué les faltó, y en qué parte de la conversación estaba esa información?</h3>
+<p>&nbsp;</p>
+<h3 style="font-size:12pt; color:#475577; margin:12px 0 4px">¿Qué resolvieron de forma distinta, y su alternativa corresponde con lo que dijo Catalina?</h3>
+<p>&nbsp;</p>
+    </div>
+  </section>
+
+  <!-- Validación de requerimientos -->
+  <section class="slide" data-id="validacion-requerimientos" data-section="Las reuniones">
+    <p class="eyebrow">Las reuniones</p>
+    <h2>La validación de los requerimientos</h2>
+    <div class="player">
+      <h3>Audio de la validación de los requerimientos</h3>
+      <audio controls preload="none" src="audio/validacion_requerimientos.mp3"></audio>
+      <p class="missing" hidden>El audio todavía no está disponible en esta página.</p>
+    </div>
+  </section>
+
+  <!-- Validación del modelo -->
+  <section class="slide" data-id="validacion-modelo" data-section="Las reuniones">
+    <p class="eyebrow">Las reuniones</p>
+    <h2>La validación del modelo conceptual</h2>
+    <div class="player">
+      <h3>Audio de la validación del modelo conceptual</h3>
+      <audio controls preload="none" src="audio/validacion_modelo.mp3"></audio>
+      <p class="missing" hidden>El audio todavía no está disponible en esta página.</p>
+    </div>
+    <p>En la siguiente diapositiva encuentran el diagrama del modelo, con las correcciones de Catalina incorporadas, para que lo comparen con el de ustedes.</p>
+  </section>
+
+  <!-- Modelo de Julián -->
+  <section class="slide" data-id="modelo-julian" data-section="El modelo de Julián">
+    <p class="eyebrow">El modelo de Julián</p>
+    <h2>Modelo conceptual de la plataforma de finanzas personales</h2>
+    <div class="diagram figure">
+      <img src="fig/modelo_julian.svg" alt="Modelo conceptual en notación James Martin con quince conceptos: persona usuaria, cuenta, entidad financiera, moneda, tasa de cambio, movimiento, cuota, categoría, tercero, etiqueta, traslado, pago fijo, presupuesto, meta de ahorro y aporte, con sus características y relaciones.">
+    </div>
+    <p class="caption">Figura 1. Modelo conceptual de la plataforma de finanzas personales. <a href="fig/modelo_julian.svg" target="_blank" rel="noopener">Abrir la imagen en tamaño completo</a></p>
+    <p>Recórranlo relación por relación, leyéndolas en los dos sentidos, y compárenlo con el suyo. Fíjense en la relación entre Presupuesto y Categoría, que lleva dos características propias, y en las dos relaciones que unen a Cuenta con Traslado.</p>
+  </section>
+
+  <!-- Lo que enseñan las correcciones: requerimientos -->
+  <section class="slide" data-id="aprendizajes-requerimientos" data-section="Lo que aprendemos">
+    <p class="eyebrow">Lo que aprendemos</p>
+    <h2>Lo que nos enseña la validación de los requerimientos</h2>
+    <div class="cols">
+      <div class="panel">
+        <h3>Quién puede ver cada información</h3>
+        <p>Julián supuso que el administrador podía ver los movimientos de las personas, y Catalina precisó que solo ve cifras agregadas. Los requerimientos también definen qué información puede ver cada tipo de usuario, y esa decisión le corresponde a quien conoce el negocio. En la plataforma de eventos van a encontrar decisiones parecidas sobre los datos de los participantes.</p>
+      </div>
+      <div class="panel">
+        <h3>Un hábito que se convierte en datos</h3>
+        <p>Registrar el gasto el mismo día es una recomendación de Catalina para las personas. Escrita como regla de los datos, impediría registrar un gasto días después, que es justamente lo que hace la mayoría de la gente. Por eso queda como una expectativa de comportamiento, y lo que se guarda son las dos fechas, la del gasto y la del registro: con ellas Catalina puede saber qué tan al día va cada persona.</p>
+      </div>
+      <div class="panel">
+        <h3>Lo que se queda por fuera</h3>
+        <p>Al escuchar la lista completa, Catalina notó que faltaban dos necesidades que ella había mencionado: cerrar una cuenta sin perder su historia y copiar el presupuesto del mes anterior. Validar con la experta sirve para confirmar lo que se entendió y también para detectar lo que se quedó por fuera al organizar la información.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lo que enseñan las correcciones: modelo -->
+  <section class="slide" data-id="aprendizajes-modelo" data-section="Lo que aprendemos">
+    <p class="eyebrow">Lo que aprendemos</p>
+    <h2>Lo que nos enseña la validación del modelo</h2>
+    <div class="cols five">
+      <div class="panel">
+        <h3>Las excepciones definen el mínimo</h3>
+        <p>Toda cuenta tiene una entidad financiera, menos el efectivo. Esa excepción hace que, del lado de la entidad, la cardinalidad mínima sea cero: una cuenta tiene cero o una entidad. Cuando la experta dice <em>todas, menos...</em>, está definiendo una cardinalidad mínima.</p>
+      </div>
+      <div class="panel">
+        <h3>Leer en los dos sentidos</h3>
+        <p>Un movimiento puede tener varias etiquetas, y una etiqueta agrupa muchos movimientos. Leída en un solo sentido, la relación parecía de uno a muchos; leída en los dos, es de muchos a muchos. En la segunda entrega van a ver cómo se resuelve esta relación en el modelo lógico.</p>
+      </div>
+      <div class="panel">
+        <h3>Características de una relación</h3>
+        <p>Los ochocientos mil pesos planeados para mercado en enero dependen a la vez del presupuesto y de la categoría. Por eso el valor planeado y el porcentaje de alerta son características de la relación entre los dos conceptos.</p>
+      </div>
+      <div class="panel">
+        <h3>Dos relaciones entre los mismos conceptos</h3>
+        <p>Cada traslado tiene una cuenta de origen y una de destino. La cuenta se relaciona dos veces con el traslado, y cada relación tiene su propio nombre y su propio significado.</p>
+      </div>
+      <div class="panel">
+        <h3>Las consultas validan el modelo</h3>
+        <p>Para confirmar el modelo, Julián lo recorrió con las preguntas de Catalina, como el costo del viaje a Cartagena por categoría. Si una consulta no encuentra sus datos al recorrer el modelo, falta un concepto, una característica o una relación.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cierre -->
+  <section class="slide" data-id="cierre" data-section="Cierre">
+    <p class="eyebrow">Cierre</p>
+    <h2>Para continuar</h2>
+    <p>Si están en el encuentro sincrónico, cuando les avise regresen a la sala principal para contarme en pocas palabras cómo les fue con la experiencia: qué les resultó más difícil, qué descubrieron y qué ajustarían en su propuesta.</p>
+    <p>El recorrido que hicieron, escuchar, especificar, modelar y validar con la experta, es el mismo que van a seguir en la primera entrega del proyecto con su plataforma de eventos y networking. Les recomiendo guardar su documento con la propuesta y la comparación, porque les va a servir como referencia.</p>
+    <p>Quedo atenta a sus preguntas.</p>
+    <div class="sign"><span class="avatar">DA</span><div><small>Saludos,</small><b>Diana Angélica</b></div></div>
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Navegación del taller">
+  <div class="controls-inner">
+    <button type="button" id="prev">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" class="primary" id="next">Siguiente</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var bar = document.getElementById('bar');
+  var dots = document.getElementById('dots');
+  var sectionName = document.getElementById('sectionName');
+  var current = 0;
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+
+  slides.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', s.querySelector('h1,h2').textContent);
+    b.addEventListener('click', function(){ go(i, true); });
+    dots.appendChild(b);
+  });
+
+  function go(i, focus){
+    if (i < 0 || i >= slides.length) return;
+    current = i;
+    slides.forEach(function(s, j){ s.hidden = j !== i; });
+    Array.prototype.forEach.call(dots.children, function(d, j){
+      d.classList.toggle('on', j === i);
+      d.classList.toggle('done', j < i);
+      if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    sectionName.textContent = slides[i].getAttribute('data-section');
+    var id = slides[i].getAttribute('data-id');
+    if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch(e){ location.hash = id; } }
+    store.set('solucion-plata-diapositiva', id);
+    window.scrollTo(0, 0);
+    if (focus) { var h = slides[i].querySelector('h1,h2'); h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  }
+  function indexOf(id){
+    for (var i = 0; i < slides.length; i++) if (slides[i].getAttribute('data-id') === id) return i;
+    return -1;
+  }
+
+  prev.addEventListener('click', function(){ go(current - 1, true); });
+  next.addEventListener('click', function(){ go(current + 1, true); });
+  document.addEventListener('keydown', function(e){
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'AUDIO')) return;
+    if (e.key === 'ArrowRight') go(current + 1, true);
+    if (e.key === 'ArrowLeft') go(current - 1, true);
+  });
+  window.addEventListener('hashchange', function(){
+    var i = indexOf(location.hash.slice(1));
+    if (i >= 0 && i !== current) go(i, false);
+  });
+
+  var start = indexOf(location.hash.slice(1));
+  if (start < 0) start = indexOf(store.get('solucion-plata-diapositiva') || '');
+  go(start < 0 ? 0 : start, false);
+
+  // Audios: si el archivo no existe, se muestra un aviso.
+  Array.prototype.forEach.call(document.querySelectorAll('.player audio'), function(a){
+    a.addEventListener('error', function(){
+      a.hidden = true;
+      var m = a.parentNode.querySelector('.missing');
+      if (m) m.hidden = false;
+    });
+  });
+
+    // Copia del formato de comparación
+  var status = document.getElementById('copyStatus');
+  var tpl = document.getElementById('plantilla');
+  document.getElementById('copyTemplate').addEventListener('click', function(){
+    var html = tpl.innerHTML, text = tpl.innerText;
+    function done(){ status.textContent = 'Formato copiado. Péguenlo en su documento.'; }
+    function fallback(){
+      var r = document.createRange(); r.selectNodeContents(tpl);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = false; try { ok = document.execCommand('copy'); } catch(e){}
+      if (ok) { sel.removeAllRanges(); done(); }
+      else { status.textContent = 'El formato quedó seleccionado; cópienlo con Ctrl+C o Cmd+C.'; }
+    }
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        var item = new ClipboardItem({
+          'text/html': new Blob([html], {type:'text/html'}),
+          'text/plain': new Blob([text], {type:'text/plain'})
+        });
+        navigator.clipboard.write([item]).then(done, fallback);
+      } else { fallback(); }
+    } catch(e){ fallback(); }
+  });
+})();
+</script>
+</body>
+</html>
