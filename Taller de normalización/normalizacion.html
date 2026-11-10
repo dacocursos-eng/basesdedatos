@@ -1,0 +1,500 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Normalización y modelo lógico</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+/* Diapositivas de sesión con la misma identidad del taller: tarjeta amplia por paso, barra de avance y navegación fija. */
+:root{
+  --bg:#eef2f6;
+  --surface:#ffffff;
+  --surface-2:#f4f7fa;
+  --ink:#24303d;
+  --muted:#5b6878;
+  --line:#c9d7e4;
+  --accent:#236fa1;
+  --accent-ink:#ffffff;
+  --accent-soft:#e3eef7;
+  --slate:#475577;
+  --ok:#24804f;
+  --ok-soft:#e5f3ea;
+  --warn:#a3501c;
+  --warn-soft:#f8ece3;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --step--1:0.9rem;
+  --step-0:1.06rem;
+  --step-1:1.25rem;
+  --step-2:1.6rem;
+  --step-3:2.15rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+    --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+    --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+  --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+  --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:var(--step-0); line-height:1.65;
+  display:flex; flex-direction:column;
+}
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:12px 8px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
+.top-inner{max-width:62rem; margin:0 auto; display:flex; flex-direction:column; gap:8px}
+.top-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.course{font-size:var(--step--1); color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-weight:600}
+.section-name{font-size:var(--step--1); color:var(--accent); font-weight:700}
+.bar{height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease}
+main{
+  flex:1; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:8px 24px;
+}
+.slide{
+  max-width:62rem; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:clamp(22px,4vw,44px); display:flex; flex-direction:column; gap:16px;
+}
+.slide[hidden]{display:none!important}
+.eyebrow{font-size:var(--step--1); letter-spacing:.08em; text-transform:uppercase; color:var(--slate); font-weight:700; margin:0}
+h1,h2,h3{font-family:var(--font-display); color:var(--ink); text-wrap:balance; margin:0; line-height:1.2}
+h1{font-size:var(--step-3); color:var(--accent)}
+h2{font-size:var(--step-2)}
+h3{font-size:var(--step-1); color:var(--slate)}
+p{margin:0; max-width:68ch}
+.lead{font-size:var(--step-1); color:var(--muted); max-width:52ch}
+ul{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:8px; max-width:68ch}
+strong{color:var(--ink)}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:16px}
+.cols > *{min-width:0}
+.panel{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.cols.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){ .cols.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:520px){ .cols.four{grid-template-columns:1fr} }
+.iana{display:grid; grid-template-columns:minmax(0,14rem) 1fr; gap:22px; align-items:center}
+.iana img{width:100%; border-radius:14px; border:1px solid var(--line); display:block}
+.iana-text{display:flex; flex-direction:column; gap:12px; min-width:0}
+@media (max-width:620px){ .iana{grid-template-columns:1fr} .iana img{max-width:14rem} }
+.panel h3{font-size:var(--step-0); font-family:var(--font-body); font-weight:700; color:var(--accent)}
+.formula{
+  font-family:var(--font-display); font-size:var(--step-1); background:var(--accent-soft); border-left:4px solid var(--accent);
+  padding:14px 18px; border-radius:6px; max-width:52ch;
+}
+.formula em{color:var(--accent); font-style:normal; font-weight:700}
+.compare{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:14px}
+.compare > div{border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.yes{background:var(--ok-soft); border:1px solid var(--ok)}
+.no{background:var(--warn-soft); border:1px solid var(--warn)}
+.tag{font-size:var(--step--1); font-weight:700; letter-spacing:.04em; text-transform:uppercase}
+.yes .tag{color:var(--ok)} .no .tag{color:var(--warn)}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px}
+table{border-collapse:collapse; width:100%; min-width:34rem; font-size:var(--step--1)}
+th{background:var(--slate); color:var(--surface); text-align:left; padding:8px 12px; font-weight:600}
+td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top}
+.story{border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.story div{display:grid; grid-template-columns:9.5rem 1fr; border-top:1px solid var(--line)}
+.story div:first-child{border-top:0}
+.story b{background:var(--surface-2); color:var(--slate); padding:9px 12px; font-size:var(--step--1)}
+.story span{padding:9px 12px; font-size:var(--step--1); min-width:0}
+@media (max-width:520px){ .story div{grid-template-columns:1fr} }
+.flow{display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; align-items:stretch; list-style:none; padding:0; max-width:none}
+.flow li{flex:1 1 7rem; border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--surface-2); display:flex; flex-direction:column; gap:4px; position:relative}
+.flow li:not(:last-child)::after{content:"\2192"; position:absolute; right:-10px; top:50%; transform:translate(50%,-50%); color:var(--muted); font-weight:700; z-index:1}
+@media (max-width:640px){ .flow{flex-direction:column} .flow li{flex:none} .flow li:not(:last-child)::after{content:"\2193"; right:50%; top:auto; bottom:-10px; transform:translate(50%,50%)} }
+.flow li.here{border-color:var(--accent); background:var(--accent-soft)}
+.flow li small{color:var(--muted); line-height:1.4}
+.flow li b{font-family:var(--font-display); font-size:var(--step-0)}
+.flow .chip{align-self:flex-start; font-size:.75rem; font-weight:700; color:var(--accent-ink); background:var(--accent); padding:1px 8px; border-radius:99px; letter-spacing:.03em}
+.diagram{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px; overflow-x:auto}
+.diagram svg{display:block; min-width:30rem; width:100%; max-width:40rem; height:auto; margin:0 auto}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:var(--step--1); color:var(--muted)}
+.people{display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:16px}
+.person{border:1px solid var(--line); border-radius:12px; padding:18px; display:flex; gap:14px; align-items:flex-start; background:var(--surface-2)}
+.person > div{min-width:0; display:flex; flex-direction:column; gap:4px}
+.avatar{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:1.2rem; background:var(--accent); color:var(--accent-ink)}
+.avatar.alt{background:var(--slate); color:var(--surface)}
+.note{background:var(--accent-soft); border-radius:10px; padding:14px 18px; max-width:68ch}
+.player{border:1px solid var(--accent); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; background:var(--accent-soft)}
+.player h3{font-family:var(--font-body); font-size:var(--step-0); color:var(--accent)}
+.player audio{width:100%}
+.player .missing{font-size:var(--step--1); color:var(--muted)}
+.scenes{display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; max-width:none}
+.scenes li{border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:var(--step--1); background:var(--surface)}
+.checks{list-style:none; padding:0}
+.checks li{display:flex; gap:10px}
+.checks li::before{content:""; flex:none; width:1.05em; height:1.05em; margin-top:.3em; border:2px solid var(--accent); border-radius:4px}
+button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.template{border:1px solid var(--line); border-radius:10px; background:#ffffff; color:#24303d; padding:18px 20px; max-height:24rem; overflow:auto; font-size:var(--step--1)}
+.template p{margin:0 0 8px}
+.template table{min-width:0; font-size:inherit}
+.template th{color:#24303d}
+.tracks{gap:6px}
+.track{display:grid; grid-template-columns:minmax(0,15rem) 1fr; gap:4px 14px; align-items:center; padding:6px 0; border-top:1px solid var(--line)}
+.track:first-child{border-top:0}
+.track span{font-weight:600; font-size:var(--step--1); color:var(--ink)}
+.track audio{width:100%; min-width:0}
+.track .missing{grid-column:2}
+@media (max-width:560px){ .track{grid-template-columns:1fr} .track .missing{grid-column:1} }
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.status{font-size:var(--step--1); color:var(--ok)}
+.sign{display:flex; align-items:center; gap:12px; margin-top:6px}
+.sign .avatar{width:44px; height:44px; font-size:1rem}
+.sign small{display:block; color:var(--muted)}
+.sign b{color:var(--slate)}
+nav.controls{
+  position:sticky; bottom:0; z-index:5; background:var(--bg); border-top:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));
+}
+.controls-inner{max-width:62rem; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:12px}
+button{
+  font:inherit; font-weight:700; border-radius:10px; padding:10px 18px; cursor:pointer; border:2px solid var(--accent);
+  background:var(--surface); color:var(--accent);
+}
+a.button{display:inline-block; text-decoration:none; font-weight:700; border-radius:10px; padding:10px 18px; border:2px solid var(--accent)}
+a.button.primary, button.primary{background:var(--accent); color:var(--accent-ink)}
+button:disabled{opacity:.4; cursor:default}
+.dots{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; flex:1; min-width:0}
+.dots button{width:12px; height:12px; padding:0; border-radius:50%; border:2px solid var(--line); background:var(--surface)}
+.dots button.on{background:var(--accent); border-color:var(--accent)}
+.dots button.done{border-color:var(--accent)}
+@media (max-width:560px){ .dots{display:none} button{padding:10px 14px} }
+@media (prefers-reduced-motion:reduce){ .bar span{transition:none} }
+
+.cols.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px){ .cols.three{grid-template-columns:1fr} }
+.datos td.hl{background:var(--warn-soft); color:var(--warn); font-weight:600}
+.datos{min-width:30rem}
+.datos td{white-space:nowrap}
+.narrow{max-width:24rem}
+.narrow table{min-width:0}
+.diagram.mid svg{max-width:52rem; min-width:40rem}
+.diagram.wide svg{max-width:none; min-width:46rem}
+.diagram.small svg{max-width:17rem; min-width:14rem}
+a.button{color:var(--accent); background:var(--surface)}
+a.button.primary{color:var(--accent-ink); background:var(--accent)}
+.template th{background:#e3eef7; color:#24303d}
+</style>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <span class="course">Bases de Datos · Sesión</span>
+      <span class="section-name" id="sectionName">Bienvenida</span>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </div>
+</header>
+
+<main id="slides">
+
+  <!-- Bienvenida -->
+  <section class="slide" data-id="bienvenida" data-section="Bienvenida">
+    <p class="eyebrow">Sesión</p>
+    <h1>Del modelo conceptual al modelo lógico</h1>
+    <p class="lead">La normalización explicada con el caso Mi plata en orden.</p>
+    <p>Apreciados estudiantes:</p>
+    <p>En el taller anterior acompañamos a Catalina y a Julián desde la conversación hasta el modelo conceptual de la plataforma. En esta sesión damos el siguiente paso: transformar ese modelo conceptual en un modelo lógico normalizado, que es lo que van a construir para su proyecto en la segunda entrega.</p>
+    <p>Primero ubicamos el modelo lógico en el camino del diseño. Después vemos, con ejemplos del caso, cada una de las formas normales y la manera de transformar las relaciones. Al final, ustedes terminan de normalizar en grupo el modelo de Julián.</p>
+  </section>
+
+  <!-- El camino -->
+  <section class="slide" data-id="abstraccion" data-section="El camino">
+    <p class="eyebrow">El camino</p>
+    <h2>Un proceso de abstracción</h2>
+    <p>Diseñar una base de datos es un proceso de abstracción. Partimos de la realidad, que llamamos el dominio del problema, y la vamos representando en modelos cada vez más cercanos a la base de datos que se va a implementar. Cada modelo se obtiene del anterior: el conceptual, por análisis de la realidad, y el lógico y el físico, por transformación.</p>
+    <ul class="flow">
+      <li><b>Realidad</b><small>El dominio del problema: el negocio tal como lo explicó Catalina.</small></li>
+      <li><b>Modelo conceptual</b><small>Se obtiene por análisis. Conceptos, características y relaciones.</small></li>
+      <li class="here"><b>Modelo lógico</b><small>Se obtiene por transformación. Entidades, atributos y llaves, en tercera forma normal.</small></li>
+      <li><b>Modelo físico</b><small>Se obtiene por transformación. Tablas y columnas en el SGBD.</small></li>
+    </ul>
+    <p>El modelo físico corresponde con el esquema de la base de datos, que se despliega y se gestiona en un sistema gestor de bases de datos (SGBD). La base de datos es ese esquema más los datos que se van guardando en él.</p>
+    <p>El modelo lógico, que es el tema de hoy, conserva el significado del modelo conceptual y lo organiza con la estructura que necesita una base de datos relacional. Por eso, desde aquí hablamos de <strong>entidades</strong> y <strong>atributos</strong>, donde antes hablábamos de conceptos y características.</p>
+  </section>
+
+  <!-- Para qué normalizamos -->
+  <section class="slide" data-id="para-que" data-section="La normalización">
+    <p class="eyebrow">La normalización</p>
+    <h2>Para qué normalizamos</h2>
+    <p>El paso del modelo conceptual al lógico se hace a través de la <strong>normalización</strong>, un conjunto de reglas para organizar los atributos en las entidades. La normalización permite:</p>
+    <ul>
+      <li>evitar la redundancia de los datos, es decir, que un mismo dato quede guardado en varios lugares;</li>
+      <li>disminuir los problemas de actualización, que aparecen cuando un mismo cambio hay que hacerlo en muchos registros;</li>
+      <li>proteger la integridad de los datos, para que la información guardada sea coherente y confiable.</li>
+    </ul>
+    <p>Miremos qué pasaría si la plataforma de Catalina guardara cada movimiento con todos sus datos juntos:</p>
+    <div class="table-wrap"><table class="datos"><thead><tr><th>fecha</th><th>valor</th><th>descripcion</th><th>categoria</th><th>cuenta</th><th>persona</th><th>correo</th></tr></thead><tbody><tr><td>2026-10-03</td><td>18.000</td><td>Domicilio</td><td>Restaurantes</td><td class="hl">Ahorros de la casa</td><td class="hl">Sofía Ramírez</td><td class="hl">sofia.r@correo.com</td></tr><tr><td>2026-10-03</td><td>4.500</td><td>Tinto</td><td>Cafetería</td><td class="hl">Efectivo</td><td class="hl">Sofía Ramírez</td><td class="hl">sofia.r@correo.com</td></tr><tr><td>2026-10-05</td><td>1.200.000</td><td>Arriendo de octubre</td><td>Vivienda</td><td class="hl">Ahorros de la casa</td><td class="hl">Sofía Ramírez</td><td class="hl">sofia.r@correo.com</td></tr><tr><td>2026-10-06</td><td>320.000</td><td>Mercado</td><td>Mercado</td><td class="hl">Ahorros de la casa</td><td class="hl">Sofía Ramírez</td><td class="hl">sofia.r@correo.com</td></tr></tbody></table></div>
+    <p>El nombre de la cuenta, el nombre de Sofía y su correo se repiten en cada movimiento. Si Sofía cambia de correo, hay que actualizarlo en todos sus movimientos, y si alguno se queda sin cambiar, la base de datos tendría dos correos distintos para la misma persona. Además, los datos de Sofía solo existirían mientras exista alguno de sus movimientos. La normalización organiza esta información en entidades relacionadas, de modo que cada dato se guarde una sola vez.</p>
+  </section>
+
+  <!-- Transformaciones -->
+  <section class="slide" data-id="transformaciones" data-section="La normalización">
+    <p class="eyebrow">La normalización</p>
+    <h2>Las transformaciones del modelo conceptual al lógico</h2>
+    <p>Para obtener el modelo lógico, al modelo conceptual se le aplican tres transformaciones, que vamos a ver con ejemplos del caso:</p>
+    <div class="cols three">
+      <div class="panel"><h3>Normalizar hasta la tercera forma normal</h3><p>Cada entidad cumple la primera, la segunda y la tercera forma normal.</p></div>
+      <div class="panel"><h3>Dejar solo relaciones de uno a muchos</h3><p>Las relaciones de uno a uno se verifican para fusionar las entidades, y las de muchos a muchos se resuelven con una entidad intermedia.</p></div>
+      <div class="panel"><h3>Transformar los elementos</h3><p>Cada concepto pasa a ser una entidad, cada característica un atributo, cada identificador una llave primaria y cada relación de uno a muchos una llave foránea.</p></div>
+    </div>
+    <p>En la práctica, las tres se trabajan juntas: al transformar las relaciones aparecen entidades nuevas, y cada entidad nueva también se revisa con las formas normales.</p>
+    <p>En el modelo lógico, los nombres de las entidades y de los atributos se escriben sin espacios ni tildes, como <em>saldo_inicial</em>, porque así van a pasar al modelo físico.</p>
+  </section>
+
+  <!-- Condiciones de partida -->
+  <section class="slide" data-id="llaves" data-section="La normalización">
+    <p class="eyebrow">La normalización</p>
+    <h2>Las condiciones de partida y las llaves</h2>
+    <p>La normalización parte de unas condiciones básicas que cumple toda entidad del modelo lógico:</p>
+    <ul>
+      <li>cada entidad tiene un nombre único en el modelo;</li>
+      <li>no puede haber dos registros iguales en una entidad. Para garantizarlo, cada entidad tiene una <strong>llave primaria</strong> (PK): un atributo, o un conjunto de atributos, cuyo valor identifica a cada registro;</li>
+      <li>todos los valores de un atributo son del mismo tipo: si <em>fecha_registro</em> guarda fechas, todos sus valores son fechas.</li>
+    </ul>
+    <p>Las entidades se conectan mediante <strong>llaves foráneas</strong> (FK). Una llave foránea es un atributo que guarda el valor de la llave primaria de otra entidad, y así indica con cuál registro de esa entidad se relaciona. En los diagramas del modelo lógico, la llave primaria se marca con PK y se subraya, y las llaves foráneas se marcan con FK.</p>
+    <p>En el modelo de Julián, cada concepto tiene una característica que identifica a sus elementos, como el correo de la persona. En el modelo lógico es habitual agregar un identificador propio, como <em>id_persona</em>, que se mantiene aunque la persona cambie de correo. El correo se conserva como atributo y sigue siendo único.</p>
+  </section>
+
+  <!-- 1FN: indivisibles -->
+  <section class="slide" data-id="primera-indivisibles" data-section="Primera forma normal">
+    <p class="eyebrow">Primera forma normal</p>
+    <h2>Primera forma normal</h2>
+    <p>Una entidad está en primera forma normal cuando cumple dos condiciones:</p>
+    <ul>
+      <li>todos sus atributos son <strong>indivisibles</strong>: cada atributo guarda un solo valor, que no se descompone en partes con significado propio;</li>
+      <li>no tiene <strong>grupos de valores repetidos</strong>: varios atributos que guardan el mismo dato, como <em>etiqueta_1</em>, <em>etiqueta_2</em> y <em>etiqueta_3</em>, o un atributo que guarda una lista de valores.</li>
+    </ul>
+    <h3>¿Son todos sus datos indivisibles?</h3>
+    <div class="table-wrap"><table class="datos"><thead><tr><th>id_persona</th><th>nombre_completo</th><th>correo</th><th>celular</th></tr></thead><tbody><tr><td>1</td><td class="hl">Sofía Ramírez Gómez</td><td>sofia.r@correo.com</td><td>300 123 4567</td></tr><tr><td>2</td><td class="hl">Andrés Felipe Torres Díaz</td><td>aftorres@correo.com</td><td class="hl">315 222 1188 / 601 345 6789</td></tr><tr><td>3</td><td class="hl">Marta Lucía Rojas</td><td>mlrojas@correo.com</td><td>320 555 0101</td></tr></tbody></table></div>
+    <p>El nombre completo reúne nombres y apellidos en un solo valor, y así no se podría, por ejemplo, ordenar a las personas por apellido ni saludarlas por su nombre. Por eso Julián registró por separado los nombres y los apellidos. En el segundo registro, el celular guarda dos números a la vez. Para cumplir la primera forma normal, cada atributo guarda un solo valor, y si la plataforma necesitara varios teléfonos por persona, se tratarían como un grupo repetido, que es el caso de la siguiente diapositiva.</p>
+  </section>
+
+  <!-- 1FN: grupos repetidos -->
+  <section class="slide" data-id="primera-grupos" data-section="Primera forma normal">
+    <p class="eyebrow">Primera forma normal</p>
+    <h2>Los grupos de valores repetidos</h2>
+    <h3>¿Existen grupos de valores repetidos?</h3>
+    <div class="table-wrap"><table class="datos"><thead><tr><th>id_movimiento</th><th>descripcion</th><th>valor</th><th>etiqueta_1</th><th>etiqueta_2</th><th>etiqueta_3</th></tr></thead><tbody><tr><td>101</td><td>Tiquetes aéreos</td><td>640.000</td><td class="hl">viaje Cartagena</td><td class="hl">vacaciones</td><td class="hl"></td></tr><tr><td>102</td><td>Hotel</td><td>900.000</td><td class="hl">viaje Cartagena</td><td class="hl">vacaciones</td><td class="hl">familia</td></tr><tr><td>103</td><td>Mercado</td><td>320.000</td><td class="hl"></td><td class="hl"></td><td class="hl"></td></tr></tbody></table></div>
+    <p>Catalina explicó que un movimiento puede tener varias etiquetas. Si se guardan en atributos repetidos, el modelo fija un máximo de tres etiquetas, deja valores vacíos cuando hay menos y obliga a buscar en tres atributos para saber cuánto costó el viaje a Cartagena. Lo mismo ocurre si todas las etiquetas se escriben en un solo atributo, separadas por comas.</p>
+    <p>Para cumplir la primera forma normal, el grupo repetido pasa a una entidad aparte, con un registro por cada etiqueta de cada movimiento:</p>
+    <div class="narrow"><div class="table-wrap"><table class="datos"><thead><tr><th>id_movimiento</th><th>etiqueta</th></tr></thead><tbody><tr><td>101</td><td>viaje Cartagena</td></tr><tr><td>101</td><td>vacaciones</td></tr><tr><td>102</td><td>viaje Cartagena</td></tr><tr><td>102</td><td>vacaciones</td></tr><tr><td>102</td><td>familia</td></tr></tbody></table></div></div>
+    <p>Así, cada movimiento puede tener las etiquetas que necesite, y la consulta del viaje a Cartagena busca en un solo atributo. Esta nueva entidad es la que resuelve la relación de muchos a muchos entre movimientos y etiquetas, que retomamos más adelante.</p>
+  </section>
+
+  <!-- 2FN -->
+  <section class="slide" data-id="segunda" data-section="Segunda forma normal">
+    <p class="eyebrow">Segunda forma normal</p>
+    <h2>Segunda forma normal</h2>
+    <p>Una entidad está en segunda forma normal cuando está en primera forma normal y todos los atributos que no forman parte de la llave primaria dependen de la llave primaria <strong>completa</strong>. Esta forma normal se revisa con especial cuidado en las entidades cuya llave primaria está formada por dos o más atributos, porque allí un atributo puede depender solo de una parte de la llave.</p>
+    <p>En el caso aparece con las cuotas. La cuota es un <strong>concepto débil</strong>: se identifica con la compra a la que pertenece y con su número, la cuota 1, la cuota 2 o la cuota 3. Su llave primaria está formada por <em>id_movimiento</em> y <em>numero</em>. Miremos los registros de una nevera comprada a tres cuotas:</p>
+    <div class="table-wrap"><table class="datos"><thead><tr><th>id_movimiento (PK)</th><th>numero (PK)</th><th>mes</th><th>capital</th><th>intereses_proyectados</th><th>estado</th><th>descripcion_compra</th><th>tasa_interes</th></tr></thead><tbody><tr><td>215</td><td>1</td><td>2026-11</td><td>600.000</td><td>37.980</td><td>pagada</td><td class="hl">Nevera</td><td class="hl">28,5 %</td></tr><tr><td>215</td><td>2</td><td>2026-12</td><td>600.000</td><td>25.320</td><td>pendiente</td><td class="hl">Nevera</td><td class="hl">28,5 %</td></tr><tr><td>215</td><td>3</td><td>2027-01</td><td>600.000</td><td>12.660</td><td>pendiente</td><td class="hl">Nevera</td><td class="hl">28,5 %</td></tr></tbody></table></div>
+    <h3>¿Qué hacer en este caso?</h3>
+    <p>La descripción de la compra y la tasa de interés dependen solo de <em>id_movimiento</em>, es decir, de la compra, y no del número de la cuota; por eso se repiten en las tres cuotas. Para cumplir la segunda forma normal, los atributos que dependen de una parte de la llave se llevan a una entidad separada, la que esa parte identifica, y las dos entidades se relacionan mediante una llave foránea. Es lo que hizo Julián: la descripción, el número de cuotas y la tasa de interés están en el movimiento, y cada cuota guarda lo que depende de la compra y de su número a la vez.</p>
+  </section>
+
+  <section class="slide" data-id="segunda-resultado" data-section="Segunda forma normal">
+    <p class="eyebrow">Segunda forma normal</p>
+    <h2>El movimiento y sus cuotas en el modelo lógico</h2>
+    <p>Así quedan las dos entidades. La llave primaria de la cuota combina la llave foránea que la une con su compra y el número de la cuota:</p>
+    <div class="diagram " role="img" aria-label="Modelo lógico: un movimiento se difiere en cero o muchas cuotas, y cada cuota pertenece a un solo movimiento. La llave primaria de cuota está formada por id_movimiento, que también es llave foránea, y numero."><svg viewBox="0 0 730 262" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="250.0,100.0 470.0,100.0" fill="none"/><line x1="264.0" y1="88.0" x2="264.0" y2="112.0"/><line x1="274.0" y1="88.0" x2="274.0" y2="112.0"/><line x1="452.0" y1="100.0" x2="470.0" y2="85.0"/><line x1="452.0" y1="100.0" x2="470.0" y2="115.0"/><circle cx="440.0" cy="100.0" r="8" fill="var(--surface)"/><rect x="20" y="20" width="230" height="226" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="250" y2="54"/><line x1="60" y1="54" x2="60" y2="246" stroke-width="1"/><rect x="470" y="20" width="240" height="182" rx="8" fill="var(--surface)"/><line x1="470" y1="54" x2="710" y2="54"/><line x1="524" y1="54" x2="524" y2="202" stroke-width="1"/></g><g fill="var(--ink)"><text x="360" y="89" text-anchor="middle" fill="var(--muted)" font-size="15">se difiere en</text><text x="135.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">movimiento</text><text x="40.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="70" y="79" font-size="15" text-decoration="underline">id_movimiento</text><text x="40.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="70" y="101" font-size="15">id_cuenta</text><text x="70" y="123" font-size="15">fecha_ocurrencia</text><text x="70" y="145" font-size="15">valor</text><text x="70" y="167" font-size="15">descripcion</text><text x="70" y="189" font-size="15">numero_cuotas</text><text x="70" y="211" font-size="15">tasa_interes</text><text x="70" y="233" font-size="15">…</text><text x="590.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">cuota</text><text x="497.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK FK</text><text x="534" y="79" font-size="15" text-decoration="underline">id_movimiento</text><text x="497.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="534" y="101" font-size="15" text-decoration="underline">numero</text><text x="534" y="123" font-size="15">mes</text><text x="534" y="145" font-size="15">capital</text><text x="534" y="167" font-size="15">intereses_proyectados</text><text x="534" y="189" font-size="15">estado</text></g></svg></div>
+    <div class="legend"><span>PK: llave primaria (subrayada)</span><span>FK: llave foránea</span><span>Círculo: cero</span><span>Barra: uno</span><span>Pata de gallo: muchos</span></div>
+    <p>Un movimiento se difiere en cero o muchas cuotas, porque no todos los movimientos son compras a cuotas, y cada cuota pertenece a un solo movimiento. La fila con puntos suspensivos indica que la entidad tiene otros atributos que no se muestran en el ejemplo.</p>
+  </section>
+
+  <!-- 3FN: transitivas -->
+  <section class="slide" data-id="tercera" data-section="Tercera forma normal">
+    <p class="eyebrow">Tercera forma normal</p>
+    <h2>Tercera forma normal</h2>
+    <p>Una entidad está en tercera forma normal cuando está en segunda forma normal y no tiene <strong>dependencias transitivas</strong>: todos sus atributos dependen solo de la llave primaria, y ninguno depende de otro atributo que no es llave. Además, no guarda <strong>datos derivados</strong>, que son los que se pueden calcular a partir de otros datos de la base de datos.</p>
+    <p>Volvamos a la cuenta. Catalina explicó que cada tipo de cuenta es siempre activo o siempre pasivo, y en el modelo de Julián la cuenta tiene la característica <em>tipo (activo o pasivo)</em>. Así se verían algunos registros:</p>
+    <div class="table-wrap"><table class="datos"><thead><tr><th>id_cuenta</th><th>nombre</th><th>tipo_cuenta</th><th>clase</th></tr></thead><tbody><tr><td>1</td><td>Ahorros de la casa</td><td>Cuenta de ahorros</td><td class="hl">Activo</td></tr><tr><td>2</td><td>Efectivo</td><td>Efectivo</td><td class="hl">Activo</td></tr><tr><td>3</td><td>Tarjeta del supermercado</td><td>Tarjeta de crédito</td><td class="hl">Pasivo</td></tr><tr><td>4</td><td>Ahorro para el viaje</td><td>Cuenta de ahorros</td><td class="hl">Activo</td></tr></tbody></table></div>
+    <p>La clase depende del tipo de cuenta, y el tipo de cuenta depende de la cuenta: es una dependencia transitiva. Cada vez que se registra una cuenta de ahorros hay que volver a escribir que es un activo, y nada impide que alguien registre por error una cuenta de ahorros como pasivo.</p>
+  </section>
+
+  <section class="slide" data-id="tercera-resultado" data-section="Tercera forma normal">
+    <p class="eyebrow">Tercera forma normal</p>
+    <h2>El tipo de cuenta como entidad</h2>
+    <p>Para cumplir la tercera forma normal, los atributos que dependen de otro atributo que no es llave pasan a una entidad propia, y la entidad original la referencia con una llave foránea. El tipo de cuenta se convierte en una entidad con su nombre y su clase:</p>
+    <div class="diagram " role="img" aria-label="Modelo lógico: un tipo de cuenta clasifica cero o muchas cuentas, y cada cuenta tiene un solo tipo. La cuenta guarda id_tipo_cuenta como llave foránea."><svg viewBox="0 0 700 196" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="230.0,75.0 450.0,75.0" fill="none"/><line x1="244.0" y1="63.0" x2="244.0" y2="87.0"/><line x1="254.0" y1="63.0" x2="254.0" y2="87.0"/><line x1="432.0" y1="75.0" x2="450.0" y2="60.0"/><line x1="432.0" y1="75.0" x2="450.0" y2="90.0"/><circle cx="420.0" cy="75.0" r="8" fill="var(--surface)"/><rect x="20" y="20" width="210" height="116" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="230" y2="54"/><line x1="60" y1="54" x2="60" y2="136" stroke-width="1"/><rect x="450" y="20" width="230" height="160" rx="8" fill="var(--surface)"/><line x1="450" y1="54" x2="680" y2="54"/><line x1="490" y1="54" x2="490" y2="180" stroke-width="1"/></g><g fill="var(--ink)"><text x="340" y="64" text-anchor="middle" fill="var(--muted)" font-size="15">clasifica</text><text x="125.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">tipo_cuenta</text><text x="40.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="70" y="79" font-size="15" text-decoration="underline">id_tipo_cuenta</text><text x="70" y="101" font-size="15">nombre</text><text x="70" y="123" font-size="15">clase</text><text x="565.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">cuenta</text><text x="470.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="500" y="79" font-size="15" text-decoration="underline">id_cuenta</text><text x="470.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="500" y="101" font-size="15">id_persona</text><text x="470.0" y="123" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="500" y="123" font-size="15">id_tipo_cuenta</text><text x="500" y="145" font-size="15">nombre</text><text x="500" y="167" font-size="15">…</text></g></svg></div>
+    <div class="legend"><span>PK: llave primaria (subrayada)</span><span>FK: llave foránea</span><span>Círculo: cero</span><span>Barra: uno</span><span>Pata de gallo: muchos</span></div>
+    <p>Ahora, que la cuenta de ahorros es un activo queda guardado una sola vez, en el registro de ese tipo de cuenta, y cada cuenta guarda en <em>id_tipo_cuenta</em> el identificador de su tipo. Esta es una de las transformaciones que necesita el modelo de Julián al pasar al modelo lógico.</p>
+  </section>
+
+  <!-- 3FN: derivados -->
+  <section class="slide" data-id="tercera-derivados" data-section="Tercera forma normal">
+    <p class="eyebrow">Tercera forma normal</p>
+    <h2>Los datos derivados</h2>
+    <p>Un dato derivado se obtiene con un cálculo sobre otros datos guardados. Supongamos que a la meta de ahorro se le agrega el atributo <em>valor_ahorrado</em>:</p>
+    <div class="table-wrap"><table class="datos"><thead><tr><th>id_meta</th><th>nombre</th><th>valor_necesario</th><th>fecha_objetivo</th><th>valor_ahorrado</th></tr></thead><tbody><tr><td>7</td><td>Viaje a Cartagena</td><td>3.000.000</td><td>2027-06-30</td><td class="hl">1.250.000</td></tr></tbody></table></div>
+    <p>Y estos son los aportes y retiros de esa meta:</p>
+    <div class="table-wrap"><table class="datos"><thead><tr><th>id_aporte</th><th>id_meta</th><th>fecha</th><th>valor</th><th>tipo</th></tr></thead><tbody><tr><td>31</td><td>7</td><td>2026-08-30</td><td>500.000</td><td>aporte</td></tr><tr><td>32</td><td>7</td><td>2026-09-30</td><td>500.000</td><td>aporte</td></tr><tr><td>33</td><td>7</td><td>2026-10-15</td><td>150.000</td><td>retiro</td></tr><tr><td>34</td><td>7</td><td>2026-10-30</td><td>400.000</td><td>aporte</td></tr></tbody></table></div>
+    <p>El valor ahorrado es la suma de los aportes menos los retiros de la meta. Si se guarda, hay que actualizarlo con cada aporte o retiro, y si alguna vez no se actualiza, la meta mostraría un valor distinto del que indican sus aportes. Para cumplir la tercera forma normal, el valor ahorrado se calcula con una consulta cada vez que se necesita, a partir de los aportes, y la meta guarda solo los datos que le son propios: su nombre, el valor necesario, la fecha objetivo y su estado.</p>
+  </section>
+
+  <!-- Relaciones 1 a N -->
+  <section class="slide" data-id="uno-a-muchos" data-section="Las relaciones">
+    <p class="eyebrow">Las relaciones</p>
+    <h2>Las relaciones de uno a muchos</h2>
+    <p>El modelo lógico admite solo relaciones de uno a muchos, porque son las que se representan con una llave foránea. La llave primaria de la entidad del lado uno pasa como llave foránea a la entidad del lado muchos:</p>
+    <div class="diagram " role="img" aria-label="Modelo lógico: una persona posee cero o muchas cuentas, y cada cuenta pertenece a una sola persona. La cuenta guarda id_persona como llave foránea."><svg viewBox="0 0 700 218" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="240.0,97.0 450.0,97.0" fill="none"/><line x1="254.0" y1="85.0" x2="254.0" y2="109.0"/><line x1="264.0" y1="85.0" x2="264.0" y2="109.0"/><line x1="432.0" y1="97.0" x2="450.0" y2="82.0"/><line x1="432.0" y1="97.0" x2="450.0" y2="112.0"/><circle cx="420.0" cy="97.0" r="8" fill="var(--surface)"/><rect x="20" y="20" width="220" height="160" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="240" y2="54"/><line x1="60" y1="54" x2="60" y2="180" stroke-width="1"/><rect x="450" y="20" width="230" height="182" rx="8" fill="var(--surface)"/><line x1="450" y1="54" x2="680" y2="54"/><line x1="490" y1="54" x2="490" y2="202" stroke-width="1"/></g><g fill="var(--ink)"><text x="345" y="86" text-anchor="middle" fill="var(--muted)" font-size="15">posee</text><text x="130.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">persona</text><text x="40.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="70" y="79" font-size="15" text-decoration="underline">id_persona</text><text x="70" y="101" font-size="15">nombres</text><text x="70" y="123" font-size="15">apellidos</text><text x="70" y="145" font-size="15">correo</text><text x="70" y="167" font-size="15">…</text><text x="565.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">cuenta</text><text x="470.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="500" y="79" font-size="15" text-decoration="underline">id_cuenta</text><text x="470.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="500" y="101" font-size="15">id_persona</text><text x="500" y="123" font-size="15">nombre</text><text x="500" y="145" font-size="15">ultimos_cuatro</text><text x="500" y="167" font-size="15">saldo_inicial</text><text x="500" y="189" font-size="15">…</text></g></svg></div>
+    <div class="legend"><span>PK: llave primaria (subrayada)</span><span>FK: llave foránea</span><span>Círculo: cero</span><span>Barra: uno</span><span>Pata de gallo: muchos</span></div>
+    <p>Una persona posee cero o muchas cuentas, y cada cuenta pertenece a una sola persona. Por eso cada registro de cuenta guarda en <em>id_persona</em> el identificador de la persona a la que pertenece. Cuando la cardinalidad mínima del lado uno es cero, la llave foránea puede quedar vacía; es lo que pasa con la entidad financiera de la cuenta de efectivo.</p>
+  </section>
+
+  <!-- Relaciones 1 a 1 -->
+  <section class="slide" data-id="uno-a-uno" data-section="Las relaciones">
+    <p class="eyebrow">Las relaciones</p>
+    <h2>Las relaciones de uno a uno</h2>
+    <p>Una relación de uno a uno indica que a cada elemento de un concepto le corresponde a lo sumo un elemento del otro. Al pasar al modelo lógico, se verifica si las dos entidades se pueden fusionar en una sola. Supongamos que un grupo modeló la tarjeta de crédito como un concepto aparte, relacionado con la cuenta:</p>
+    <div class="diagram " role="img" aria-label="Modelo conceptual: una cuenta tiene cero o una tarjeta de crédito, y cada tarjeta de crédito corresponde a una sola cuenta."><svg viewBox="0 0 680 174" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="230.0,97.0 450.0,97.0" fill="none"/><line x1="244.0" y1="85.0" x2="244.0" y2="109.0"/><line x1="254.0" y1="85.0" x2="254.0" y2="109.0"/><line x1="436.0" y1="109.0" x2="436.0" y2="85.0"/><circle cx="420.0" cy="97.0" r="8" fill="var(--surface)"/><rect x="20" y="20" width="210" height="138" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="230" y2="54"/><rect x="450" y="20" width="210" height="116" rx="8" fill="var(--surface)"/><line x1="450" y1="54" x2="660" y2="54"/></g><g fill="var(--ink)"><text x="340" y="86" text-anchor="middle" fill="var(--muted)" font-size="15">tiene</text><text x="125.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">Cuenta</text><text x="34" y="79" font-size="15">nombre</text><text x="34" y="101" font-size="15">tipo</text><text x="34" y="123" font-size="15">saldo inicial</text><text x="34" y="145" font-size="15">estado</text><text x="555.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">Tarjeta de crédito</text><text x="464" y="79" font-size="15">cupo</text><text x="464" y="101" font-size="15">día de corte</text><text x="464" y="123" font-size="15">día de pago</text></g></svg></div>
+    <p>Cada tarjeta corresponde a una sola cuenta, y cada cuenta tiene cero o una tarjeta. El cupo, el día de corte y el día de pago describen a la misma cuenta, así que las dos entidades se fusionan y esos datos quedan como atributos de la cuenta, como lo decidió Julián:</p>
+    <div class="diagram small" role="img" aria-label="La cuenta, con los atributos de la tarjeta de crédito fusionados: nombre, tipo, saldo inicial, estado, cupo, día de corte y día de pago."><svg viewBox="0 0 270 240" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><rect x="20" y="20" width="230" height="204" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="250" y2="54"/></g><g fill="var(--ink)"><text x="135.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">Cuenta</text><text x="34" y="79" font-size="15">nombre</text><text x="34" y="101" font-size="15">tipo</text><text x="34" y="123" font-size="15">saldo inicial</text><text x="34" y="145" font-size="15">estado</text><text x="34" y="167" font-size="15">cupo</text><text x="34" y="189" font-size="15">día de corte</text><text x="34" y="211" font-size="15">día de pago</text></g></svg></div>
+    <p>En las cuentas que no son tarjetas de crédito, esos tres atributos quedan vacíos.</p>
+  </section>
+
+  <!-- Relaciones N a M -->
+  <section class="slide" data-id="muchos-a-muchos" data-section="Las relaciones">
+    <p class="eyebrow">Las relaciones</p>
+    <h2>Las relaciones de muchos a muchos</h2>
+    <p>En una relación de muchos a muchos, cada registro de una entidad tendría que guardar varios valores de la otra, y eso rompe la primera forma normal. Por eso se resuelve con una <strong>entidad intermedia</strong>, también llamada auxiliar, débil o de rompimiento, que se relaciona con cada una de las dos entidades mediante una relación de uno a muchos. En el modelo de Julián, un movimiento se marca con cero o muchas etiquetas, y una etiqueta marca cero o muchos movimientos:</p>
+    <div class="diagram " role="img" aria-label="Modelo conceptual: un movimiento se marca con cero o muchas etiquetas, y una etiqueta marca cero o muchos movimientos."><svg viewBox="0 0 680 152" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="240.0,75.0 470.0,75.0" fill="none"/><line x1="258.0" y1="75.0" x2="240.0" y2="90.0"/><line x1="258.0" y1="75.0" x2="240.0" y2="60.0"/><circle cx="270.0" cy="75.0" r="8" fill="var(--surface)"/><line x1="452.0" y1="75.0" x2="470.0" y2="60.0"/><line x1="452.0" y1="75.0" x2="470.0" y2="90.0"/><circle cx="440.0" cy="75.0" r="8" fill="var(--surface)"/><rect x="20" y="20" width="220" height="116" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="240" y2="54"/><rect x="470" y="20" width="190" height="72" rx="8" fill="var(--surface)"/><line x1="470" y1="54" x2="660" y2="54"/></g><g fill="var(--ink)"><text x="355" y="64" text-anchor="middle" fill="var(--muted)" font-size="15">se marca con</text><text x="130.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">Movimiento</text><text x="34" y="79" font-size="15">fecha en que ocurrió</text><text x="34" y="101" font-size="15">valor</text><text x="34" y="123" font-size="15">descripción</text><text x="565.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">Etiqueta</text><text x="484" y="79" font-size="15">nombre</text></g></svg></div>
+    <p>En el modelo lógico, la relación se transforma en la entidad <em>movimiento_etiqueta</em>. Cada registro une un movimiento con una etiqueta, y su llave primaria está formada por las dos llaves foráneas:</p>
+    <div class="diagram mid" role="img" aria-label="Modelo lógico: un movimiento tiene cero o muchos registros en movimiento_etiqueta, y una etiqueta también; cada registro de movimiento_etiqueta pertenece a un solo movimiento y a una sola etiqueta."><svg viewBox="0 0 980 218" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="240.0,67.0 380.0,67.0" fill="none"/><line x1="254.0" y1="55.0" x2="254.0" y2="79.0"/><line x1="264.0" y1="55.0" x2="264.0" y2="79.0"/><line x1="362.0" y1="67.0" x2="380.0" y2="52.0"/><line x1="362.0" y1="67.0" x2="380.0" y2="82.0"/><circle cx="350.0" cy="67.0" r="8" fill="var(--surface)"/><polyline points="760.0,67.0 620.0,67.0" fill="none"/><line x1="746.0" y1="79.0" x2="746.0" y2="55.0"/><line x1="736.0" y1="79.0" x2="736.0" y2="55.0"/><line x1="638.0" y1="67.0" x2="620.0" y2="82.0"/><line x1="638.0" y1="67.0" x2="620.0" y2="52.0"/><circle cx="650.0" cy="67.0" r="8" fill="var(--surface)"/><rect x="20" y="20" width="220" height="182" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="240" y2="54"/><line x1="60" y1="54" x2="60" y2="202" stroke-width="1"/><rect x="380" y="20" width="240" height="94" rx="8" fill="var(--surface)"/><line x1="380" y1="54" x2="620" y2="54"/><line x1="434" y1="54" x2="434" y2="114" stroke-width="1"/><rect x="760" y="20" width="200" height="116" rx="8" fill="var(--surface)"/><line x1="760" y1="54" x2="960" y2="54"/><line x1="800" y1="54" x2="800" y2="136" stroke-width="1"/></g><g fill="var(--ink)"><text x="130.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">movimiento</text><text x="40.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="70" y="79" font-size="15" text-decoration="underline">id_movimiento</text><text x="40.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="70" y="101" font-size="15">id_cuenta</text><text x="70" y="123" font-size="15">fecha_ocurrencia</text><text x="70" y="145" font-size="15">valor</text><text x="70" y="167" font-size="15">descripcion</text><text x="70" y="189" font-size="15">…</text><text x="500.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">movimiento_etiqueta</text><text x="407.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK FK</text><text x="444" y="79" font-size="15" text-decoration="underline">id_movimiento</text><text x="407.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK FK</text><text x="444" y="101" font-size="15" text-decoration="underline">id_etiqueta</text><text x="860.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">etiqueta</text><text x="780.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="810" y="79" font-size="15" text-decoration="underline">id_etiqueta</text><text x="780.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="810" y="101" font-size="15">id_persona</text><text x="810" y="123" font-size="15">nombre</text></g></svg></div>
+    <div class="legend"><span>PK: llave primaria (subrayada)</span><span>FK: llave foránea</span><span>Círculo: cero</span><span>Barra: uno</span><span>Pata de gallo: muchos</span></div>
+    <p>Así quedan dos relaciones de uno a muchos. Las llaves foráneas <em>id_cuenta</em> e <em>id_persona</em> vienen de las relaciones del movimiento con la cuenta y de la etiqueta con la persona que la creó. Cuando la relación de muchos a muchos tiene características propias, esas características pasan a ser atributos de la entidad intermedia, porque dependen de las dos entidades a la vez.</p>
+  </section>
+
+  <!-- Resultado -->
+  <section class="slide" data-id="fragmento" data-section="El resultado">
+    <p class="eyebrow">El resultado</p>
+    <h2>Los ejemplos juntos: un fragmento del modelo lógico</h2>
+    <p>Este fragmento reúne, ya normalizadas, las entidades que trabajamos en los ejemplos. Las filas con puntos suspensivos indican otros atributos; en el modelo completo, la cuenta y el movimiento llevan además las llaves foráneas de las entidades con las que se relacionan, como la entidad financiera, la moneda o la categoría.</p>
+    <div class="diagram wide" role="img" aria-label="Fragmento del modelo lógico con persona, cuenta, tipo_cuenta, movimiento, cuota, movimiento_etiqueta y etiqueta, con sus llaves primarias y foráneas y relaciones de uno a muchos."><svg viewBox="0 0 1040 680" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="260.0,100.0 420.0,100.0" fill="none"/><line x1="274.0" y1="88.0" x2="274.0" y2="112.0"/><line x1="284.0" y1="88.0" x2="284.0" y2="112.0"/><line x1="402.0" y1="100.0" x2="420.0" y2="85.0"/><line x1="402.0" y1="100.0" x2="420.0" y2="115.0"/><circle cx="390.0" cy="100.0" r="8" fill="var(--surface)"/><polyline points="810.0,78.0 650.0,78.0" fill="none"/><line x1="796.0" y1="90.0" x2="796.0" y2="66.0"/><line x1="786.0" y1="90.0" x2="786.0" y2="66.0"/><line x1="668.0" y1="78.0" x2="650.0" y2="93.0"/><line x1="668.0" y1="78.0" x2="650.0" y2="63.0"/><circle cx="680.0" cy="78.0" r="8" fill="var(--surface)"/><polyline points="535.0,224.0 535.0,320.0" fill="none"/><line x1="547.0" y1="238.0" x2="523.0" y2="238.0"/><line x1="547.0" y1="248.0" x2="523.0" y2="248.0"/><line x1="535.0" y1="302.0" x2="550.0" y2="320.0"/><line x1="535.0" y1="302.0" x2="520.0" y2="320.0"/><circle cx="535.0" cy="290.0" r="8" fill="var(--surface)"/><polyline points="420.0,411.0 260.0,411.0" fill="none"/><line x1="406.0" y1="423.0" x2="406.0" y2="399.0"/><line x1="396.0" y1="423.0" x2="396.0" y2="399.0"/><line x1="278.0" y1="411.0" x2="260.0" y2="426.0"/><line x1="278.0" y1="411.0" x2="260.0" y2="396.0"/><circle cx="290.0" cy="411.0" r="8" fill="var(--surface)"/><polyline points="650.0,367.0 810.0,367.0" fill="none"/><line x1="664.0" y1="355.0" x2="664.0" y2="379.0"/><line x1="674.0" y1="355.0" x2="674.0" y2="379.0"/><line x1="792.0" y1="367.0" x2="810.0" y2="352.0"/><line x1="792.0" y1="367.0" x2="810.0" y2="382.0"/><circle cx="780.0" cy="367.0" r="8" fill="var(--surface)"/><polyline points="915.0,540.0 915.0,414.0" fill="none"/><line x1="903.0" y1="526.0" x2="927.0" y2="526.0"/><line x1="903.0" y1="516.0" x2="927.0" y2="516.0"/><line x1="915.0" y1="432.0" x2="900.0" y2="414.0"/><line x1="915.0" y1="432.0" x2="930.0" y2="414.0"/><circle cx="915.0" cy="444.0" r="8" fill="var(--surface)"/><polyline points="50.0,140.0 12.0,140.0 12.0,600.0 810.0,600.0" fill="none"/><line x1="36.0" y1="152.0" x2="36.0" y2="128.0"/><line x1="26.0" y1="152.0" x2="26.0" y2="128.0"/><line x1="792.0" y1="600.0" x2="810.0" y2="585.0"/><line x1="792.0" y1="600.0" x2="810.0" y2="615.0"/><circle cx="780.0" cy="600.0" r="8" fill="var(--surface)"/><rect x="50" y="20" width="210" height="160" rx="8" fill="var(--surface)"/><line x1="50" y1="54" x2="260" y2="54"/><line x1="90" y1="54" x2="90" y2="180" stroke-width="1"/><rect x="420" y="20" width="230" height="204" rx="8" fill="var(--surface)"/><line x1="420" y1="54" x2="650" y2="54"/><line x1="460" y1="54" x2="460" y2="224" stroke-width="1"/><rect x="810" y="20" width="210" height="116" rx="8" fill="var(--surface)"/><line x1="810" y1="54" x2="1020" y2="54"/><line x1="850" y1="54" x2="850" y2="136" stroke-width="1"/><rect x="30" y="320" width="230" height="182" rx="8" fill="var(--surface)"/><line x1="30" y1="354" x2="260" y2="354"/><line x1="84" y1="354" x2="84" y2="502" stroke-width="1"/><rect x="420" y="320" width="230" height="226" rx="8" fill="var(--surface)"/><line x1="420" y1="354" x2="650" y2="354"/><line x1="460" y1="354" x2="460" y2="546" stroke-width="1"/><rect x="810" y="320" width="220" height="94" rx="8" fill="var(--surface)"/><line x1="810" y1="354" x2="1030" y2="354"/><line x1="864" y1="354" x2="864" y2="414" stroke-width="1"/><rect x="810" y="540" width="210" height="116" rx="8" fill="var(--surface)"/><line x1="810" y1="574" x2="1020" y2="574"/><line x1="850" y1="574" x2="850" y2="656" stroke-width="1"/></g><g fill="var(--ink)"><text x="340" y="89" text-anchor="middle" fill="var(--muted)" font-size="15">posee</text><text x="730" y="67" text-anchor="middle" fill="var(--muted)" font-size="15">clasifica</text><text x="547" y="276" text-anchor="start" fill="var(--muted)" font-size="15">registra</text><text x="340" y="396" text-anchor="middle" fill="var(--muted)" font-size="15">se difiere en</text><text x="430" y="589" text-anchor="middle" fill="var(--muted)" font-size="15">crea</text><text x="155.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">persona</text><text x="70.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="100" y="79" font-size="15" text-decoration="underline">id_persona</text><text x="100" y="101" font-size="15">nombres</text><text x="100" y="123" font-size="15">apellidos</text><text x="100" y="145" font-size="15">correo</text><text x="100" y="167" font-size="15">…</text><text x="535.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">cuenta</text><text x="440.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="470" y="79" font-size="15" text-decoration="underline">id_cuenta</text><text x="440.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="470" y="101" font-size="15">id_persona</text><text x="440.0" y="123" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="470" y="123" font-size="15">id_tipo_cuenta</text><text x="470" y="145" font-size="15">nombre</text><text x="470" y="167" font-size="15">ultimos_cuatro</text><text x="470" y="189" font-size="15">saldo_inicial</text><text x="470" y="211" font-size="15">…</text><text x="915.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">tipo_cuenta</text><text x="830.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="860" y="79" font-size="15" text-decoration="underline">id_tipo_cuenta</text><text x="860" y="101" font-size="15">nombre</text><text x="860" y="123" font-size="15">clase</text><text x="145.0" y="343" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">cuota</text><text x="57.0" y="379" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK FK</text><text x="94" y="379" font-size="15" text-decoration="underline">id_movimiento</text><text x="57.0" y="401" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="94" y="401" font-size="15" text-decoration="underline">numero</text><text x="94" y="423" font-size="15">mes</text><text x="94" y="445" font-size="15">capital</text><text x="94" y="467" font-size="15">intereses_proyectados</text><text x="94" y="489" font-size="15">estado</text><text x="535.0" y="343" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">movimiento</text><text x="440.0" y="379" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="470" y="379" font-size="15" text-decoration="underline">id_movimiento</text><text x="440.0" y="401" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="470" y="401" font-size="15">id_cuenta</text><text x="470" y="423" font-size="15">fecha_ocurrencia</text><text x="470" y="445" font-size="15">valor</text><text x="470" y="467" font-size="15">descripcion</text><text x="470" y="489" font-size="15">numero_cuotas</text><text x="470" y="511" font-size="15">tasa_interes</text><text x="470" y="533" font-size="15">…</text><text x="920.0" y="343" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">movimiento_etiqueta</text><text x="837.0" y="379" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK FK</text><text x="874" y="379" font-size="15" text-decoration="underline">id_movimiento</text><text x="837.0" y="401" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK FK</text><text x="874" y="401" font-size="15" text-decoration="underline">id_etiqueta</text><text x="915.0" y="563" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">etiqueta</text><text x="830.0" y="599" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="860" y="599" font-size="15" text-decoration="underline">id_etiqueta</text><text x="830.0" y="621" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="860" y="621" font-size="15">id_persona</text><text x="860" y="643" font-size="15">nombre</text></g></svg></div>
+    <div class="legend"><span>PK: llave primaria (subrayada)</span><span>FK: llave foránea</span><span>Círculo: cero</span><span>Barra: uno</span><span>Pata de gallo: muchos</span></div>
+  </section>
+
+  <!-- Taller -->
+  <section class="slide" data-id="taller" data-section="El taller">
+    <p class="eyebrow">El taller</p>
+    <h2>Ahora ustedes: el taller de normalización</h2>
+    <p>Les propongo aplicar lo que vimos en un taller en grupo: transformar en un modelo lógico en tercera forma normal el modelo conceptual de Mi plata en orden que construyeron en el taller anterior, o el modelo de Julián, si no alcanzaron a terminar el suyo.</p>
+    <p>En la página del taller encuentran las indicaciones, un repaso de las reglas que van a aplicar, preguntas para revisar el modelo y un formato para registrar su trabajo.</p>
+    <p><a class="button primary" href="https://dacocursos-eng.github.io/basesdedatos/mi-plata-en-orden/taller_normalizacion.html" target="_blank" rel="noopener">Ir al taller de normalización</a></p>
+  </section>
+
+  <!-- Cierre -->
+  <section class="slide" data-id="cierre" data-section="Cierre">
+    <p class="eyebrow">Cierre</p>
+    <h2>Para continuar</h2>
+    <p>El recorrido de hoy, transformar los elementos, transformar las relaciones y revisar las formas normales, es el mismo que van a seguir en la segunda entrega con el modelo conceptual de su plataforma de eventos y networking. Les recomiendo guardar el modelo lógico de Mi plata en orden y el registro de sus decisiones, porque les va a servir como referencia.</p>
+    <p>Quedo atenta a sus preguntas.</p>
+    <div class="sign"><span class="avatar">DA</span><div><small>Saludos,</small><b>Diana Angélica</b></div></div>
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Navegación de la sesión">
+  <div class="controls-inner">
+    <button type="button" id="prev">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" class="primary" id="next">Siguiente</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var bar = document.getElementById('bar');
+  var dots = document.getElementById('dots');
+  var sectionName = document.getElementById('sectionName');
+  var current = 0;
+  var KEY = 'clase-normalizacion-diapositiva';
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+  slides.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', s.querySelector('h1,h2').textContent);
+    b.addEventListener('click', function(){ go(i, true); });
+    dots.appendChild(b);
+  });
+  function go(i, focus){
+    if (i < 0 || i >= slides.length) return;
+    current = i;
+    slides.forEach(function(s, j){ s.hidden = j !== i; });
+    Array.prototype.forEach.call(dots.children, function(d, j){
+      d.classList.toggle('on', j === i);
+      d.classList.toggle('done', j < i);
+      if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    sectionName.textContent = slides[i].getAttribute('data-section');
+    var id = slides[i].getAttribute('data-id');
+    if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch(e){ location.hash = id; } }
+    store.set(KEY, id);
+    window.scrollTo(0, 0);
+    if (focus) { var h = slides[i].querySelector('h1,h2'); h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  }
+  function indexOf(id){
+    for (var i = 0; i < slides.length; i++) if (slides[i].getAttribute('data-id') === id) return i;
+    return -1;
+  }
+  prev.addEventListener('click', function(){ go(current - 1, true); });
+  next.addEventListener('click', function(){ go(current + 1, true); });
+  document.addEventListener('keydown', function(e){
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+    if (e.key === 'ArrowRight') go(current + 1, true);
+    if (e.key === 'ArrowLeft') go(current - 1, true);
+  });
+  window.addEventListener('hashchange', function(){
+    var i = indexOf(location.hash.slice(1));
+    if (i >= 0 && i !== current) go(i, false);
+  });
+  var start = indexOf(location.hash.slice(1));
+  if (start < 0) start = indexOf(store.get(KEY) || '');
+  go(start < 0 ? 0 : start, false);
+
+  var status = document.getElementById('copyStatus');
+  var tpl = document.getElementById('plantilla');
+  var copyBtn = document.getElementById('copyTemplate');
+  if (copyBtn) copyBtn.addEventListener('click', function(){
+    var html = tpl.innerHTML, text = tpl.innerText;
+    function done(){ status.textContent = 'Formato copiado. Péguenlo en su documento.'; }
+    function fallback(){
+      var r = document.createRange(); r.selectNodeContents(tpl);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = false; try { ok = document.execCommand('copy'); } catch(e){}
+      if (ok) { sel.removeAllRanges(); done(); }
+      else { status.textContent = 'El formato quedó seleccionado; cópienlo con Ctrl+C o Cmd+C.'; }
+    }
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        var item = new ClipboardItem({
+          'text/html': new Blob([html], {type:'text/html'}),
+          'text/plain': new Blob([text], {type:'text/plain'})
+        });
+        navigator.clipboard.write([item]).then(done, fallback);
+      } else { fallback(); }
+    } catch(e){ fallback(); }
+  });
+})();
+</script>
+
+</body></html>
