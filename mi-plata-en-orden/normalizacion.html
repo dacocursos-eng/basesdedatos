@@ -331,6 +331,27 @@ a.button.primary{color:var(--accent-ink); background:var(--accent)}
     <p>Ahora, que la cuenta de ahorros es un activo queda guardado una sola vez, en el registro de ese tipo de cuenta, y cada cuenta guarda en <em>id_tipo_cuenta</em> el identificador de su tipo. Esta es una de las transformaciones que necesita el modelo de Julián al pasar al modelo lógico.</p>
   </section>
 
+  <!-- Segunda y tercera -->
+  <section class="slide" data-id="segunda-tercera" data-section="Tercera forma normal">
+    <p class="eyebrow">Tercera forma normal</p>
+    <h2>La diferencia entre la segunda y la tercera forma normal</h2>
+    <p>Las dos formas normales eliminan dependencias que producen redundancia. Las distingue <strong>de qué</strong> depende el atributo que se repite.</p>
+    <div class="cols two">
+      <div class="panel">
+        <h3>Segunda forma normal: dependencia parcial</h3>
+        <p>Todo atributo que no forma parte de la llave primaria depende de la llave <strong>completa</strong>. Se revisa en las entidades cuya llave primaria tiene dos o más atributos.</p>
+        <p>La llave de la cuota es <em>id_movimiento</em> y <em>numero</em>. La tasa de interés depende solo de <em>id_movimiento</em>, porque es la tasa de la compra y es la misma en todas sus cuotas. Por eso se lleva al movimiento.</p>
+      </div>
+      <div class="panel">
+        <h3>Tercera forma normal: dependencia transitiva</h3>
+        <p>Ningún atributo que no es llave depende de otro atributo que tampoco es llave. Se revisa en todas las entidades, con llave simple o compuesta.</p>
+        <p>En la cuenta, <em>id_cuenta</em> determina <em>tipo_cuenta</em>, y <em>tipo_cuenta</em> determina la <em>clase</em>, activo o pasivo. La clase depende de la cuenta a través del tipo. Por eso pasa a la entidad <em>tipo_cuenta</em>.</p>
+      </div>
+    </div>
+    <p>En la segunda forma normal, el atributo depende de una parte de la llave; en la tercera, depende de otro atributo que no es llave. Una frase clásica lo resume: cada atributo depende "de la llave, de toda la llave y nada más que de la llave". "De toda la llave" corresponde a la segunda forma normal, y "nada más que de la llave", a la tercera.</p>
+    <p>Por eso una entidad con llave simple, como la cuenta, cumple siempre la segunda forma normal y aun así puede necesitar ajustes para cumplir la tercera.</p>
+  </section>
+
   <!-- 3FN: derivados -->
   <section class="slide" data-id="tercera-derivados" data-section="Tercera forma normal">
     <p class="eyebrow">Tercera forma normal</p>
