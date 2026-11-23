@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Taller del modelo físico</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+/* Diapositivas de sesión con la misma identidad del taller: tarjeta amplia por paso, barra de avance y navegación fija. */
+:root{
+  --bg:#eef2f6;
+  --surface:#ffffff;
+  --surface-2:#f4f7fa;
+  --ink:#24303d;
+  --muted:#5b6878;
+  --line:#c9d7e4;
+  --accent:#236fa1;
+  --accent-ink:#ffffff;
+  --accent-soft:#e3eef7;
+  --slate:#475577;
+  --ok:#24804f;
+  --ok-soft:#e5f3ea;
+  --warn:#a3501c;
+  --warn-soft:#f8ece3;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --step--1:0.9rem;
+  --step-0:1.06rem;
+  --step-1:1.25rem;
+  --step-2:1.6rem;
+  --step-3:2.15rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+    --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+    --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+  --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+  --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:var(--step-0); line-height:1.65;
+  display:flex; flex-direction:column;
+}
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:12px 8px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
+.top-inner{max-width:62rem; margin:0 auto; display:flex; flex-direction:column; gap:8px}
+.top-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.course{font-size:var(--step--1); color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-weight:600}
+.section-name{font-size:var(--step--1); color:var(--accent); font-weight:700}
+.bar{height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease}
+main{
+  flex:1; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:8px 24px;
+}
+.slide{
+  max-width:62rem; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:clamp(22px,4vw,44px); display:flex; flex-direction:column; gap:16px;
+}
+.slide[hidden]{display:none!important}
+.eyebrow{font-size:var(--step--1); letter-spacing:.08em; text-transform:uppercase; color:var(--slate); font-weight:700; margin:0}
+h1,h2,h3{font-family:var(--font-display); color:var(--ink); text-wrap:balance; margin:0; line-height:1.2}
+h1{font-size:var(--step-3); color:var(--accent)}
+h2{font-size:var(--step-2)}
+h3{font-size:var(--step-1); color:var(--slate)}
+p{margin:0; max-width:68ch}
+.lead{font-size:var(--step-1); color:var(--muted); max-width:52ch}
+ul{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:8px; max-width:68ch}
+strong{color:var(--ink)}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:16px}
+.cols > *{min-width:0}
+.panel{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.cols.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){ .cols.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:520px){ .cols.four{grid-template-columns:1fr} }
+.iana{display:grid; grid-template-columns:minmax(0,14rem) 1fr; gap:22px; align-items:center}
+.iana img{width:100%; border-radius:14px; border:1px solid var(--line); display:block}
+.iana-text{display:flex; flex-direction:column; gap:12px; min-width:0}
+@media (max-width:620px){ .iana{grid-template-columns:1fr} .iana img{max-width:14rem} }
+.panel h3{font-size:var(--step-0); font-family:var(--font-body); font-weight:700; color:var(--accent)}
+.formula{
+  font-family:var(--font-display); font-size:var(--step-1); background:var(--accent-soft); border-left:4px solid var(--accent);
+  padding:14px 18px; border-radius:6px; max-width:52ch;
+}
+.formula em{color:var(--accent); font-style:normal; font-weight:700}
+.compare{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:14px}
+.compare > div{border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.yes{background:var(--ok-soft); border:1px solid var(--ok)}
+.no{background:var(--warn-soft); border:1px solid var(--warn)}
+.tag{font-size:var(--step--1); font-weight:700; letter-spacing:.04em; text-transform:uppercase}
+.yes .tag{color:var(--ok)} .no .tag{color:var(--warn)}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px}
+table{border-collapse:collapse; width:100%; min-width:34rem; font-size:var(--step--1)}
+th{background:var(--slate); color:var(--surface); text-align:left; padding:8px 12px; font-weight:600}
+td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top}
+.story{border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.story div{display:grid; grid-template-columns:9.5rem 1fr; border-top:1px solid var(--line)}
+.story div:first-child{border-top:0}
+.story b{background:var(--surface-2); color:var(--slate); padding:9px 12px; font-size:var(--step--1)}
+.story span{padding:9px 12px; font-size:var(--step--1); min-width:0}
+@media (max-width:520px){ .story div{grid-template-columns:1fr} }
+.flow{display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; align-items:stretch; list-style:none; padding:0; max-width:none}
+.flow li{flex:1 1 7rem; border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--surface-2); display:flex; flex-direction:column; gap:4px; position:relative}
+.flow li:not(:last-child)::after{content:"\2192"; position:absolute; right:-10px; top:50%; transform:translate(50%,-50%); color:var(--muted); font-weight:700; z-index:1}
+@media (max-width:640px){ .flow{flex-direction:column} .flow li{flex:none} .flow li:not(:last-child)::after{content:"\2193"; right:50%; top:auto; bottom:-10px; transform:translate(50%,50%)} }
+.flow li.here{border-color:var(--accent); background:var(--accent-soft)}
+.flow li small{color:var(--muted); line-height:1.4}
+.flow li b{font-family:var(--font-display); font-size:var(--step-0)}
+.flow .chip{align-self:flex-start; font-size:.75rem; font-weight:700; color:var(--accent-ink); background:var(--accent); padding:1px 8px; border-radius:99px; letter-spacing:.03em}
+.diagram{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px; overflow-x:auto}
+.diagram svg{display:block; min-width:30rem; width:100%; max-width:40rem; height:auto; margin:0 auto}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:var(--step--1); color:var(--muted)}
+.people{display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:16px}
+.person{border:1px solid var(--line); border-radius:12px; padding:18px; display:flex; gap:14px; align-items:flex-start; background:var(--surface-2)}
+.person > div{min-width:0; display:flex; flex-direction:column; gap:4px}
+.avatar{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:1.2rem; background:var(--accent); color:var(--accent-ink)}
+.avatar.alt{background:var(--slate); color:var(--surface)}
+.note{background:var(--accent-soft); border-radius:10px; padding:14px 18px; max-width:68ch}
+.player{border:1px solid var(--accent); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; background:var(--accent-soft)}
+.player h3{font-family:var(--font-body); font-size:var(--step-0); color:var(--accent)}
+.player audio{width:100%}
+.player .missing{font-size:var(--step--1); color:var(--muted)}
+.scenes{display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; max-width:none}
+.scenes li{border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:var(--step--1); background:var(--surface)}
+.checks{list-style:none; padding:0}
+.checks li{display:flex; gap:10px}
+.checks li::before{content:""; flex:none; width:1.05em; height:1.05em; margin-top:.3em; border:2px solid var(--accent); border-radius:4px}
+button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.template{border:1px solid var(--line); border-radius:10px; background:#ffffff; color:#24303d; padding:18px 20px; max-height:24rem; overflow:auto; font-size:var(--step--1)}
+.template p{margin:0 0 8px}
+.template table{min-width:0; font-size:inherit}
+.template th{color:#24303d}
+.tracks{gap:6px}
+.track{display:grid; grid-template-columns:minmax(0,15rem) 1fr; gap:4px 14px; align-items:center; padding:6px 0; border-top:1px solid var(--line)}
+.track:first-child{border-top:0}
+.track span{font-weight:600; font-size:var(--step--1); color:var(--ink)}
+.track audio{width:100%; min-width:0}
+.track .missing{grid-column:2}
+@media (max-width:560px){ .track{grid-template-columns:1fr} .track .missing{grid-column:1} }
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.status{font-size:var(--step--1); color:var(--ok)}
+.sign{display:flex; align-items:center; gap:12px; margin-top:6px}
+.sign .avatar{width:44px; height:44px; font-size:1rem}
+.sign small{display:block; color:var(--muted)}
+.sign b{color:var(--slate)}
+nav.controls{
+  position:sticky; bottom:0; z-index:5; background:var(--bg); border-top:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));
+}
+.controls-inner{max-width:62rem; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:12px}
+button{
+  font:inherit; font-weight:700; border-radius:10px; padding:10px 18px; cursor:pointer; border:2px solid var(--accent);
+  background:var(--surface); color:var(--accent);
+}
+a.button{display:inline-block; text-decoration:none; font-weight:700; border-radius:10px; padding:10px 18px; border:2px solid var(--accent)}
+a.button.primary, button.primary{background:var(--accent); color:var(--accent-ink)}
+button:disabled{opacity:.4; cursor:default}
+.dots{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; flex:1; min-width:0}
+.dots button{width:12px; height:12px; padding:0; border-radius:50%; border:2px solid var(--line); background:var(--surface)}
+.dots button.on{background:var(--accent); border-color:var(--accent)}
+.dots button.done{border-color:var(--accent)}
+@media (max-width:560px){ .dots{display:none} button{padding:10px 14px} }
+@media (prefers-reduced-motion:reduce){ .bar span{transition:none} }
+
+.cols.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px){ .cols.three{grid-template-columns:1fr} }
+.datos td.hl{background:var(--warn-soft); color:var(--warn); font-weight:600}
+.datos{min-width:30rem}
+.datos td{white-space:nowrap}
+.narrow{max-width:24rem}
+.narrow table{min-width:0}
+.diagram.mid svg{max-width:52rem; min-width:40rem}
+.diagram.wide svg{max-width:none; min-width:46rem}
+.diagram.small svg{max-width:17rem; min-width:14rem}
+a.button{color:var(--accent); background:var(--surface)}
+a.button.primary{color:var(--accent-ink); background:var(--accent)}
+.template th{background:#e3eef7; color:#24303d}
+
+.slide p, .slide li, .slide td{overflow-wrap:anywhere}
+.slide li{min-width:0}
+.code-wrap{position:relative; margin:0.4rem 0 1rem}
+pre.code{background:#f5f8fb; border:1px solid #d5dee8; border-radius:10px; padding:0.9rem 1rem; overflow:auto; font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size:0.86rem; line-height:1.5; color:#24303d; margin:0; white-space:pre}
+pre.code .kw{color:#1d5f8f; font-weight:700}
+pre.code .ty{color:#7a4fa0}
+pre.code .st{color:#9a4d16}
+pre.code .cm{color:#6b7787; font-style:italic}
+.code-wrap .copy{position:absolute; top:6px; right:6px; font-size:0.75rem; padding:4px 10px; min-height:0}
+.sqlerror{background:var(--warn-soft); color:var(--warn); border-radius:8px; padding:0.6rem 0.9rem; font-family:ui-monospace, Consolas, monospace; font-size:0.82rem; margin:0.3rem 0 1rem; overflow-wrap:anywhere}
+.sqlerror strong{font-family:inherit}
+table.resultado td{white-space:nowrap}
+.mapa{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0.8rem; margin:0.8rem 0 1rem}
+.mapa .grupo{border:1.5px solid #b8cfe0; border-radius:12px; padding:0.8rem; background:var(--surface)}
+.mapa .grupo b{display:block; color:var(--accent); margin-bottom:0.2rem}
+.mapa .grupo small{display:block; color:var(--muted); margin-bottom:0.5rem}
+.mapa .chip{display:inline-block; border-radius:999px; padding:2px 10px; margin:2px 4px 2px 0; background:#e3eef7; color:#1d5f8f; font-family:ui-monospace, Consolas, monospace; font-size:0.8rem; font-weight:700}
+.mapa .chip.on{background:#f2b632; color:#3a2a00}
+.mapa .grupo.on{border-color:var(--accent); box-shadow:0 0 0 2px rgba(35,111,161,.15)}
+@media (max-width:760px){ .mapa{grid-template-columns:1fr} }
+.cols.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){ .cols.two{grid-template-columns:1fr} }
+.figura img{width:100%; height:auto; border:1px solid #d5dee8; border-radius:10px; background:#fff}
+table.reglas{min-width:38rem}
+table.reglas td:first-child{white-space:nowrap}
+</style>
+
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <span class="course">Bases de Datos · Taller</span>
+      <span class="section-name" id="sectionName">Bienvenida</span>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </div>
+</header>
+
+<main id="slides">
+
+  <section class="slide" data-id="bienvenida" data-section="Bienvenida">
+    <p class="eyebrow">Taller</p>
+    <h1>El modelo físico de Mi plata en orden</h1>
+    
+    <p class="lead">De las entidades del modelo lógico a las tablas de MySQL.</p>
+    <p>Apreciados estudiantes:</p>
+    <p>En este taller van a construir en MySQL una parte del modelo físico de Mi plata en orden: van a escribir el script que crea las tablas, con sus llaves y sus restricciones, a poblarlas con datos del caso y a practicar las sentencias para actualizar, eliminar y consultar. Es el mismo trabajo que van a hacer en la tercera entrega con el modelo de su plataforma de eventos y networking.</p>
+    <p>Primero preparamos MySQL y revisamos el modelo de partida. Después vienen las tareas, un reto para quienes terminen antes y una estructura sugerida para organizar el script.</p>
+    <div class="note">Si quieren repasar algún ejemplo, la sesión del modelo físico está disponible aquí: <a href="https://dacocursos-eng.github.io/basesdedatos/mi-plata-en-orden/logico_fisico.html" target="_blank" rel="noopener">Del modelo lógico al modelo físico</a>.</div>
+
+  </section>
+
+  <section class="slide" data-id="preparar" data-section="Antes de empezar">
+    <p class="eyebrow">Antes de empezar</p>
+    <h2>Preparar MySQL</h2>
+    
+    <p>Van a trabajar con MySQL 8.0.16 o una versión posterior, que es la que aplica las restricciones <code>CHECK</code>. Pueden escribir y ejecutar el script en MySQL Workbench o en la consola de MySQL.</p>
+    <p>Les recomiendo escribir el script en un archivo <code>.sql</code> que compartan en el grupo, y empezarlo con estas líneas, que crean una base de datos nueva para el taller:</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code1">Copiar</button><pre class="code" id="code1"><code><span class="kw">DROP DATABASE</span> <span class="kw">IF EXISTS</span> mi_plata_taller;
+<span class="kw">CREATE DATABASE</span> mi_plata_taller;
+<span class="kw">USE</span> mi_plata_taller;
+<span class="kw">SET</span> NAMES utf8mb4;</code></pre></div>
+    <p>La primera línea elimina la base de datos si ya existe; así pueden corregir el script y volver a ejecutarlo completo desde el principio todas las veces que lo necesiten. La última hace que MySQL guarde bien las tildes y la eñe.</p>
+
+  </section>
+
+  <section class="slide" data-id="modelo" data-section="El modelo de partida">
+    <p class="eyebrow">El modelo de partida</p>
+    <h2>El modelo lógico de Julián</h2>
+    
+    <p>El punto de partida es el modelo lógico normalizado de Julián. Las entidades en naranja son las que surgieron al normalizar.</p>
+    <div class="figura"><a href="fig/modelo_logico_julian.png" target="_blank" rel="noopener"><img src="fig/modelo_logico_julian.png" alt="Modelo lógico normalizado de Mi plata en orden, con 22 entidades, sus llaves primarias y foráneas y sus relaciones de uno a muchos."></a></div>
+    <p><a class="button" href="fig/modelo_logico_julian.png" target="_blank" rel="noopener">Ver la imagen completa</a> <a class="button primary" href="https://app.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fdacocursos-eng%2Fbasesdedatos%2Fmain%2Fmi-plata-en-orden%2Ffig%2FModelo_Julian_Mi_plata_en_orden.drawio" target="_blank" rel="noopener">Abrir el modelo en draw.io</a></p>
+    <p>Al abrir el modelo en draw.io, cada uno trabaja sobre una copia: si quieren guardar sus cambios, usen <em>Archivo &gt; Guardar como</em> y guárdenla en su computador o en su Google Drive. El archivo tiene tres páginas: el modelo conceptual, el modelo lógico normalizado y las decisiones de normalización.</p>
+
+  </section>
+
+  <section class="slide" data-id="nucleo" data-section="El modelo de partida">
+    <p class="eyebrow">El modelo de partida</p>
+    <h2>Las tablas del taller</h2>
+    
+    <p>En el taller van a construir el núcleo del modelo, formado por siete tablas:</p>
+    <div class="table-wrap"><table class="reglas">
+      <thead><tr><th>Tabla</th><th>Columnas</th></tr></thead>
+      <tbody>
+        <tr><td><em>ciudad</em></td><td>id_ciudad, nombre</td></tr>
+        <tr><td><em>persona</em></td><td>id_persona, id_ciudad, nombres, apellidos, correo, celular, fecha_registro, tope_gasto_hormiga</td></tr>
+        <tr><td><em>tipo_cuenta</em></td><td>id_tipo_cuenta, nombre, clase</td></tr>
+        <tr><td><em>moneda</em></td><td>codigo_moneda, nombre</td></tr>
+        <tr><td><em>cuenta</em></td><td>id_cuenta, id_persona, id_tipo_cuenta, codigo_moneda, nombre, ultimos_cuatro, saldo_inicial, fecha_saldo_inicial, estado, cupo, dia_corte, dia_pago</td></tr>
+        <tr><td><em>categoria</em></td><td>id_categoria, id_categoria_padre, id_persona, nombre, naturaleza</td></tr>
+        <tr><td><em>movimiento</em></td><td>id_movimiento, id_cuenta, id_categoria, fecha_ocurrencia, fecha_registro, valor, descripcion, numero_cuotas, tasa_interes</td></tr>
+      </tbody>
+    </table></div>
+    <p>En el modelo completo, la cuenta tiene además la llave foránea <em>id_entidad</em>, y el movimiento, <em>id_tercero</em> e <em>id_pago_fijo</em>. Esas columnas hacen referencia a tablas que no están en el núcleo, así que en el taller se dejan por fuera; la entidad financiera se agrega en el reto.</p>
+
+  </section>
+
+  <section class="slide" data-id="crear" data-section="Las tareas">
+    <p class="eyebrow">Las tareas</p>
+    <h2>Crear las tablas</h2>
+    
+    <p>Escriban las sentencias <code>CREATE TABLE</code> de las siete tablas, en un orden que permita crear cada una después de las tablas a las que hace referencia. En cada tabla:</p>
+    <ul class="checks">
+      <li>elijan el tipo de dato de cada columna, y usen <code>AUTO_INCREMENT</code> en los identificadores numéricos;</li>
+      <li>decidan qué columnas son <code>NOT NULL</code> y cuáles admiten <code>NULL</code>, a partir de la cardinalidad mínima y de las reglas de negocio;</li>
+      <li>declaren la llave primaria y las llaves foráneas, y elijan para cada llave foránea su acción <code>ON DELETE</code> y <code>ON UPDATE</code>, con un comentario que explique por qué;</li>
+      <li>conviertan en restricciones las reglas de negocio que se pueden verificar en los datos de la fila, y nómbrenlas con <code>CONSTRAINT</code>.</li>
+    </ul>
+    <p>Estas son las reglas de la primera entrega que se relacionan con las tablas del núcleo:</p>
+    <div class="table-wrap"><table class="reglas">
+      <tbody>
+        <tr><td>RN_001</td><td>El correo electrónico de cada persona usuaria es único.</td></tr>
+        <tr><td>RN_002</td><td>Cada cuenta pertenece a una sola persona usuaria.</td></tr>
+        <tr><td>RN_003</td><td>Cada cuenta maneja una sola moneda.</td></tr>
+        <tr><td>RN_005</td><td>Los tipos de cuenta son ahorros, corriente, billetera digital, inversión, efectivo, tarjeta de crédito y crédito. Los cinco primeros son de clase activo y los dos últimos, de clase pasivo.</td></tr>
+        <tr><td>RN_006</td><td>El estado de una cuenta es activa o cerrada.</td></tr>
+        <tr><td>RN_007</td><td>El cupo, el día de corte y el día de pago se registran para las tarjetas de crédito; el día de corte y el día de pago están entre 1 y 31, y el cupo es mayor que cero.</td></tr>
+        <tr><td>RN_008</td><td>Cada movimiento tiene una sola categoría, y cada categoría es de ingreso o de gasto.</td></tr>
+        <tr><td>RN_009</td><td>El valor de un movimiento es mayor que cero.</td></tr>
+        <tr><td>RN_014</td><td>Una compra a cuotas tiene un número de cuotas mayor o igual a uno.</td></tr>
+      </tbody>
+    </table></div>
+
+  </section>
+
+  <section class="slide" data-id="poblar" data-section="Las tareas">
+    <p class="eyebrow">Las tareas</p>
+    <h2>Poblar las tablas</h2>
+    
+    <p>Escriban las sentencias <code>INSERT</code> para poblar las tablas en el mismo orden en que las crearon. Les propongo usar personas, cuentas y movimientos parecidos a los que contó Catalina, como el arriendo, el mercado, el tinto o la compra de un electrodoméstico a cuotas. Como mínimo:</p>
+    <ul>
+      <li>tres ciudades y dos monedas;</li>
+      <li>los siete tipos de cuenta de la regla RN_005, con su clase;</li>
+      <li>dos personas;</li>
+      <li>cinco cuentas, entre ellas una de efectivo y una tarjeta de crédito con su cupo, su día de corte y su día de pago;</li>
+      <li>ocho categorías, entre ellas dos subcategorías y una categoría propia de una persona;</li>
+      <li>doce movimientos de ingreso y de gasto, entre ellos una compra a cuotas.</li>
+    </ul>
+    <p>Después de poblar cada tabla, revisen su contenido con <code>SELECT * FROM</code> y el nombre de la tabla.</p>
+
+  </section>
+
+  <section class="slide" data-id="probar" data-section="Las tareas">
+    <p class="eyebrow">Las tareas</p>
+    <h2>Probar las restricciones</h2>
+    
+    <p>Una restricción funciona cuando MySQL rechaza los datos que la incumplen. Escriban al menos cinco sentencias que deberían ser rechazadas, ejecútenlas una por una y copien debajo de cada una, como comentario, la respuesta de MySQL. Por ejemplo:</p>
+    <ul class="checks">
+      <li>un movimiento con valor cero;</li>
+      <li>una persona con un correo que ya está registrado;</li>
+      <li>una tarjeta de crédito con día de corte 35;</li>
+      <li>una cuenta para una persona que no existe;</li>
+      <li>un tipo de cuenta con una clase distinta de activo o pasivo;</li>
+      <li>eliminar una categoría que tiene movimientos.</li>
+    </ul>
+    <p>Si alguna de estas sentencias es aceptada, revisen la restricción correspondiente en el script de creación.</p>
+
+  </section>
+
+  <section class="slide" data-id="manipular" data-section="Las tareas">
+    <p class="eyebrow">Las tareas</p>
+    <h2>Actualizar, eliminar y consultar</h2>
+    
+    <p>Escriban una sentencia para cada tarea. Los valores X y Y los eligen ustedes, de acuerdo con los datos que registraron.</p>
+    <div class="cols two">
+      <div class="panel">
+        <h3>UPDATE</h3>
+        <ul>
+          <li>Cambiar el correo de la persona X.</li>
+          <li>Aumentar el cupo de la tarjeta de crédito X.</li>
+          <li>Cerrar la cuenta X.</li>
+          <li>Corregir la descripción y el valor del movimiento X.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>DELETE</h3>
+        <ul>
+          <li>Eliminar el movimiento X.</li>
+          <li>Eliminar una categoría que no tenga movimientos.</li>
+          <li>Intentar eliminar una persona que tiene cuentas, y explicar en un comentario la respuesta de MySQL según la acción ON DELETE que eligieron.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>SELECT</h3>
+      <ul>
+        <li>Todas las personas registradas.</li>
+        <li>Las cuentas activas de la persona X.</li>
+        <li>Los movimientos de la cuenta X, con su fecha, su descripción y su valor.</li>
+        <li>Las categorías de gasto.</li>
+        <li>Los movimientos con valor mayor que Y.</li>
+        <li>Las subcategorías de la categoría X.</li>
+        <li>Las cuentas que no tienen día de corte.</li>
+        <li>Los movimientos registrados entre dos fechas X y Y.</li>
+      </ul>
+    </div>
+    <p>Antes de cada UPDATE y cada DELETE, consulten con un SELECT y la misma condición cuáles registros van a cambiar.</p>
+
+  </section>
+
+  <section class="slide" data-id="reto" data-section="El reto">
+    <p class="eyebrow">El reto</p>
+    <h2>Reto: la entidad financiera</h2>
+    
+    <p>Para quienes terminen antes, les propongo completar la relación de la cuenta con la entidad financiera, que en el modelo lógico depende de otras dos tablas:</p>
+    <ul class="checks">
+      <li>creen las tablas <em>pais</em>, <em>tipo_entidad</em> y <em>entidad_financiera</em>, y puéblenlas;</li>
+      <li>agreguen a la tabla <em>cuenta</em> la columna <em>id_entidad</em> y su llave foránea con <code>ALTER TABLE</code>, sin volver a crear la tabla;</li>
+      <li>asignen con <code>UPDATE</code> la entidad financiera de cada cuenta, y dejen sin entidad la cuenta de efectivo (RN_004);</li>
+      <li>consulten las cuentas que no tienen entidad financiera.</li>
+    </ul>
+    <p>Piensen qué acción <code>ON DELETE</code> conviene para esta llave foránea, teniendo en cuenta que la columna admite valores vacíos.</p>
+
+  </section>
+
+  <section class="slide" data-id="preguntas" data-section="La revisión">
+    <p class="eyebrow">La revisión</p>
+    <h2>Preguntas para revisar el script</h2>
+    
+    <p>Antes de dar por terminado el script, revísenlo con estas preguntas:</p>
+    <ul class="checks">
+      <li>¿El script se ejecuta completo, de principio a fin, sin errores, sobre una base de datos vacía?</li>
+      <li>¿Cada tabla tiene su llave primaria, y cada relación del modelo lógico, su llave foránea?</li>
+      <li>¿Las columnas que admiten NULL corresponden con relaciones opcionales o con datos que no siempre se conocen?</li>
+      <li>¿Cada regla de negocio que se puede verificar en los datos de la fila quedó como restricción?</li>
+      <li>¿La acción ON DELETE de cada llave foránea tiene sentido para el negocio de Catalina?</li>
+      <li>¿Los tipos de datos permiten guardar todos los valores del caso, por ejemplo un arriendo de 1.200.000 pesos o una tasa de 28,50 %?</li>
+      <li>¿Cada UPDATE y cada DELETE tiene una condición que afecta solo los registros que se querían cambiar?</li>
+    </ul>
+
+  </section>
+
+  <section class="slide" data-id="estructura" data-section="La revisión">
+    <p class="eyebrow">La revisión</p>
+    <h2>Una estructura sugerida para el script</h2>
+    
+    <p>Les comparto una estructura para organizar el script por secciones. Es una propuesta: si su grupo prefiere organizarlo de otra manera, tienen toda la libertad de hacerlo.</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code2">Copiar</button><pre class="code" id="code2"><code><span class="cm">-- ============================================================</span>
+<span class="cm">-- Mi plata en orden · Modelo físico (taller)</span>
+<span class="cm">-- Grupo:</span>
+<span class="cm">-- Integrantes:</span>
+<span class="cm">-- ============================================================</span>
+
+<span class="kw">DROP DATABASE</span> <span class="kw">IF EXISTS</span> mi_plata_taller;
+<span class="kw">CREATE DATABASE</span> mi_plata_taller;
+<span class="kw">USE</span> mi_plata_taller;
+<span class="kw">SET</span> NAMES utf8mb4;
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Creación de las tablas</span>
+<span class="cm">-- (primero las que no tienen llaves foráneas)</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- Tabla ciudad</span>
+
+<span class="cm">-- Tabla tipo_cuenta (RN_005)</span>
+
+<span class="cm">-- ...</span>
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Poblado de las tablas</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Pruebas de las restricciones</span>
+<span class="cm">-- (escriban debajo de cada sentencia la respuesta de MySQL)</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- UPDATE, DELETE y SELECT</span>
+<span class="cm">-- ------------------------------------------------------------</span></code></pre></div>
+
+  </section>
+
+  <section class="slide" data-id="cierre" data-section="Cierre">
+    <p class="eyebrow">Cierre</p>
+    <h2>Para continuar</h2>
+    
+    <p>Cuando terminen, ejecuten el script completo una vez más sobre una base de datos vacía y guárdenlo, porque es la base del script que van a construir en la tercera entrega. Después del encuentro les comparto el script de Julián, con las 22 tablas del modelo, para que lo comparen con el suyo.</p>
+    <p>Quedo atenta a sus preguntas.</p>
+    <div class="sign"><span class="avatar">DA</span><div><small>Saludos,</small><b>Diana Angélica</b></div></div>
+
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Navegación del taller">
+  <div class="controls-inner">
+    <button type="button" id="prev">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" class="primary" id="next">Siguiente</button>
+  </div>
+</nav>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var bar = document.getElementById('bar');
+  var dots = document.getElementById('dots');
+  var sectionName = document.getElementById('sectionName');
+  var current = 0;
+  var KEY = 'taller-fisico-diapositiva';
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+  slides.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', s.querySelector('h1,h2').textContent);
+    b.addEventListener('click', function(){ go(i, true); });
+    dots.appendChild(b);
+  });
+  function go(i, focus){
+    if (i < 0 || i >= slides.length) return;
+    current = i;
+    slides.forEach(function(s, j){ s.hidden = j !== i; });
+    Array.prototype.forEach.call(dots.children, function(d, j){
+      d.classList.toggle('on', j === i);
+      d.classList.toggle('done', j < i);
+      if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    sectionName.textContent = slides[i].getAttribute('data-section');
+    var id = slides[i].getAttribute('data-id');
+    if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch(e){ location.hash = id; } }
+    store.set(KEY, id);
+    window.scrollTo(0, 0);
+    if (focus) { var h = slides[i].querySelector('h1,h2'); h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  }
+  function indexOf(id){
+    for (var i = 0; i < slides.length; i++) if (slides[i].getAttribute('data-id') === id) return i;
+    return -1;
+  }
+  prev.addEventListener('click', function(){ go(current - 1, true); });
+  next.addEventListener('click', function(){ go(current + 1, true); });
+  document.addEventListener('keydown', function(e){
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+    if (e.key === 'ArrowRight') go(current + 1, true);
+    if (e.key === 'ArrowLeft') go(current - 1, true);
+  });
+  window.addEventListener('hashchange', function(){
+    var i = indexOf(location.hash.slice(1));
+    if (i >= 0 && i !== current) go(i, false);
+  });
+  var start = indexOf(location.hash.slice(1));
+  if (start < 0) start = indexOf(store.get(KEY) || '');
+  go(start < 0 ? 0 : start, false);
+
+  var status = document.getElementById('copyStatus');
+  var tpl = document.getElementById('plantilla');
+  var copyBtn = document.getElementById('copyTemplate');
+  if (copyBtn) copyBtn.addEventListener('click', function(){
+    var html = tpl.innerHTML, text = tpl.innerText;
+    function done(){ status.textContent = 'Formato copiado. Péguenlo en su documento.'; }
+    function fallback(){
+      var r = document.createRange(); r.selectNodeContents(tpl);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = false; try { ok = document.execCommand('copy'); } catch(e){}
+      if (ok) { sel.removeAllRanges(); done(); }
+      else { status.textContent = 'El formato quedó seleccionado; cópienlo con Ctrl+C o Cmd+C.'; }
+    }
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        var item = new ClipboardItem({
+          'text/html': new Blob([html], {type:'text/html'}),
+          'text/plain': new Blob([text], {type:'text/plain'})
+        });
+        navigator.clipboard.write([item]).then(done, fallback);
+      } else { fallback(); }
+    } catch(e){ fallback(); }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  document.querySelectorAll('.copy[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = document.getElementById(b.getAttribute('data-copy')).innerText;
+      function ok(){ var o = b.textContent; b.textContent = 'Copiado'; setTimeout(function(){ b.textContent = o; }, 1500); }
+      try {
+        if (navigator.clipboard) { navigator.clipboard.writeText(t).then(ok, function(){ sel(); }); } else { sel(); }
+      } catch(e){ sel(); }
+      function sel(){ var r = document.createRange(); r.selectNodeContents(document.getElementById(b.getAttribute('data-copy'))); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Seleccionado: Ctrl+C'; }
+    });
+  });
+})();
+</script>
+</body>
+</html>

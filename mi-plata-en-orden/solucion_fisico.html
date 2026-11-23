@@ -1,0 +1,1121 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Script de Julián</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+/* Diapositivas de sesión con la misma identidad del taller: tarjeta amplia por paso, barra de avance y navegación fija. */
+:root{
+  --bg:#eef2f6;
+  --surface:#ffffff;
+  --surface-2:#f4f7fa;
+  --ink:#24303d;
+  --muted:#5b6878;
+  --line:#c9d7e4;
+  --accent:#236fa1;
+  --accent-ink:#ffffff;
+  --accent-soft:#e3eef7;
+  --slate:#475577;
+  --ok:#24804f;
+  --ok-soft:#e5f3ea;
+  --warn:#a3501c;
+  --warn-soft:#f8ece3;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --step--1:0.9rem;
+  --step-0:1.06rem;
+  --step-1:1.25rem;
+  --step-2:1.6rem;
+  --step-3:2.15rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+    --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+    --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+  --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+  --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:var(--step-0); line-height:1.65;
+  display:flex; flex-direction:column;
+}
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:12px 8px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
+.top-inner{max-width:62rem; margin:0 auto; display:flex; flex-direction:column; gap:8px}
+.top-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.course{font-size:var(--step--1); color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-weight:600}
+.section-name{font-size:var(--step--1); color:var(--accent); font-weight:700}
+.bar{height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease}
+main{
+  flex:1; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:8px 24px;
+}
+.slide{
+  max-width:62rem; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:clamp(22px,4vw,44px); display:flex; flex-direction:column; gap:16px;
+}
+.slide[hidden]{display:none!important}
+.eyebrow{font-size:var(--step--1); letter-spacing:.08em; text-transform:uppercase; color:var(--slate); font-weight:700; margin:0}
+h1,h2,h3{font-family:var(--font-display); color:var(--ink); text-wrap:balance; margin:0; line-height:1.2}
+h1{font-size:var(--step-3); color:var(--accent)}
+h2{font-size:var(--step-2)}
+h3{font-size:var(--step-1); color:var(--slate)}
+p{margin:0; max-width:68ch}
+.lead{font-size:var(--step-1); color:var(--muted); max-width:52ch}
+ul{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:8px; max-width:68ch}
+strong{color:var(--ink)}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:16px}
+.cols > *{min-width:0}
+.panel{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.cols.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){ .cols.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:520px){ .cols.four{grid-template-columns:1fr} }
+.iana{display:grid; grid-template-columns:minmax(0,14rem) 1fr; gap:22px; align-items:center}
+.iana img{width:100%; border-radius:14px; border:1px solid var(--line); display:block}
+.iana-text{display:flex; flex-direction:column; gap:12px; min-width:0}
+@media (max-width:620px){ .iana{grid-template-columns:1fr} .iana img{max-width:14rem} }
+.panel h3{font-size:var(--step-0); font-family:var(--font-body); font-weight:700; color:var(--accent)}
+.formula{
+  font-family:var(--font-display); font-size:var(--step-1); background:var(--accent-soft); border-left:4px solid var(--accent);
+  padding:14px 18px; border-radius:6px; max-width:52ch;
+}
+.formula em{color:var(--accent); font-style:normal; font-weight:700}
+.compare{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:14px}
+.compare > div{border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.yes{background:var(--ok-soft); border:1px solid var(--ok)}
+.no{background:var(--warn-soft); border:1px solid var(--warn)}
+.tag{font-size:var(--step--1); font-weight:700; letter-spacing:.04em; text-transform:uppercase}
+.yes .tag{color:var(--ok)} .no .tag{color:var(--warn)}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px}
+table{border-collapse:collapse; width:100%; min-width:34rem; font-size:var(--step--1)}
+th{background:var(--slate); color:var(--surface); text-align:left; padding:8px 12px; font-weight:600}
+td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top}
+.story{border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.story div{display:grid; grid-template-columns:9.5rem 1fr; border-top:1px solid var(--line)}
+.story div:first-child{border-top:0}
+.story b{background:var(--surface-2); color:var(--slate); padding:9px 12px; font-size:var(--step--1)}
+.story span{padding:9px 12px; font-size:var(--step--1); min-width:0}
+@media (max-width:520px){ .story div{grid-template-columns:1fr} }
+.flow{display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; align-items:stretch; list-style:none; padding:0; max-width:none}
+.flow li{flex:1 1 7rem; border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--surface-2); display:flex; flex-direction:column; gap:4px; position:relative}
+.flow li:not(:last-child)::after{content:"\2192"; position:absolute; right:-10px; top:50%; transform:translate(50%,-50%); color:var(--muted); font-weight:700; z-index:1}
+@media (max-width:640px){ .flow{flex-direction:column} .flow li{flex:none} .flow li:not(:last-child)::after{content:"\2193"; right:50%; top:auto; bottom:-10px; transform:translate(50%,50%)} }
+.flow li.here{border-color:var(--accent); background:var(--accent-soft)}
+.flow li small{color:var(--muted); line-height:1.4}
+.flow li b{font-family:var(--font-display); font-size:var(--step-0)}
+.flow .chip{align-self:flex-start; font-size:.75rem; font-weight:700; color:var(--accent-ink); background:var(--accent); padding:1px 8px; border-radius:99px; letter-spacing:.03em}
+.diagram{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px; overflow-x:auto}
+.diagram svg{display:block; min-width:30rem; width:100%; max-width:40rem; height:auto; margin:0 auto}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:var(--step--1); color:var(--muted)}
+.people{display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:16px}
+.person{border:1px solid var(--line); border-radius:12px; padding:18px; display:flex; gap:14px; align-items:flex-start; background:var(--surface-2)}
+.person > div{min-width:0; display:flex; flex-direction:column; gap:4px}
+.avatar{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:1.2rem; background:var(--accent); color:var(--accent-ink)}
+.avatar.alt{background:var(--slate); color:var(--surface)}
+.note{background:var(--accent-soft); border-radius:10px; padding:14px 18px; max-width:68ch}
+.player{border:1px solid var(--accent); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; background:var(--accent-soft)}
+.player h3{font-family:var(--font-body); font-size:var(--step-0); color:var(--accent)}
+.player audio{width:100%}
+.player .missing{font-size:var(--step--1); color:var(--muted)}
+.scenes{display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; max-width:none}
+.scenes li{border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:var(--step--1); background:var(--surface)}
+.checks{list-style:none; padding:0}
+.checks li{display:flex; gap:10px}
+.checks li::before{content:""; flex:none; width:1.05em; height:1.05em; margin-top:.3em; border:2px solid var(--accent); border-radius:4px}
+button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.template{border:1px solid var(--line); border-radius:10px; background:#ffffff; color:#24303d; padding:18px 20px; max-height:24rem; overflow:auto; font-size:var(--step--1)}
+.template p{margin:0 0 8px}
+.template table{min-width:0; font-size:inherit}
+.template th{color:#24303d}
+.tracks{gap:6px}
+.track{display:grid; grid-template-columns:minmax(0,15rem) 1fr; gap:4px 14px; align-items:center; padding:6px 0; border-top:1px solid var(--line)}
+.track:first-child{border-top:0}
+.track span{font-weight:600; font-size:var(--step--1); color:var(--ink)}
+.track audio{width:100%; min-width:0}
+.track .missing{grid-column:2}
+@media (max-width:560px){ .track{grid-template-columns:1fr} .track .missing{grid-column:1} }
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.status{font-size:var(--step--1); color:var(--ok)}
+.sign{display:flex; align-items:center; gap:12px; margin-top:6px}
+.sign .avatar{width:44px; height:44px; font-size:1rem}
+.sign small{display:block; color:var(--muted)}
+.sign b{color:var(--slate)}
+nav.controls{
+  position:sticky; bottom:0; z-index:5; background:var(--bg); border-top:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));
+}
+.controls-inner{max-width:62rem; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:12px}
+button{
+  font:inherit; font-weight:700; border-radius:10px; padding:10px 18px; cursor:pointer; border:2px solid var(--accent);
+  background:var(--surface); color:var(--accent);
+}
+a.button{display:inline-block; text-decoration:none; font-weight:700; border-radius:10px; padding:10px 18px; border:2px solid var(--accent)}
+a.button.primary, button.primary{background:var(--accent); color:var(--accent-ink)}
+button:disabled{opacity:.4; cursor:default}
+.dots{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; flex:1; min-width:0}
+.dots button{width:12px; height:12px; padding:0; border-radius:50%; border:2px solid var(--line); background:var(--surface)}
+.dots button.on{background:var(--accent); border-color:var(--accent)}
+.dots button.done{border-color:var(--accent)}
+@media (max-width:560px){ .dots{display:none} button{padding:10px 14px} }
+@media (prefers-reduced-motion:reduce){ .bar span{transition:none} }
+
+.cols.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px){ .cols.three{grid-template-columns:1fr} }
+.datos td.hl{background:var(--warn-soft); color:var(--warn); font-weight:600}
+.datos{min-width:30rem}
+.datos td{white-space:nowrap}
+.narrow{max-width:24rem}
+.narrow table{min-width:0}
+.diagram.mid svg{max-width:52rem; min-width:40rem}
+.diagram.wide svg{max-width:none; min-width:46rem}
+.diagram.small svg{max-width:17rem; min-width:14rem}
+a.button{color:var(--accent); background:var(--surface)}
+a.button.primary{color:var(--accent-ink); background:var(--accent)}
+.template th{background:#e3eef7; color:#24303d}
+
+.slide p, .slide li, .slide td{overflow-wrap:anywhere}
+.slide li{min-width:0}
+.code-wrap{position:relative; margin:0.4rem 0 1rem}
+pre.code{background:#f5f8fb; border:1px solid #d5dee8; border-radius:10px; padding:0.9rem 1rem; overflow:auto; font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size:0.86rem; line-height:1.5; color:#24303d; margin:0; white-space:pre}
+pre.code .kw{color:#1d5f8f; font-weight:700}
+pre.code .ty{color:#7a4fa0}
+pre.code .st{color:#9a4d16}
+pre.code .cm{color:#6b7787; font-style:italic}
+.code-wrap .copy{position:absolute; top:6px; right:6px; font-size:0.75rem; padding:4px 10px; min-height:0}
+.sqlerror{background:var(--warn-soft); color:var(--warn); border-radius:8px; padding:0.6rem 0.9rem; font-family:ui-monospace, Consolas, monospace; font-size:0.82rem; margin:0.3rem 0 1rem; overflow-wrap:anywhere}
+.sqlerror strong{font-family:inherit}
+table.resultado td{white-space:nowrap}
+.mapa{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0.8rem; margin:0.8rem 0 1rem}
+.mapa .grupo{border:1.5px solid #b8cfe0; border-radius:12px; padding:0.8rem; background:var(--surface)}
+.mapa .grupo b{display:block; color:var(--accent); margin-bottom:0.2rem}
+.mapa .grupo small{display:block; color:var(--muted); margin-bottom:0.5rem}
+.mapa .chip{display:inline-block; border-radius:999px; padding:2px 10px; margin:2px 4px 2px 0; background:#e3eef7; color:#1d5f8f; font-family:ui-monospace, Consolas, monospace; font-size:0.8rem; font-weight:700}
+.mapa .chip.on{background:#f2b632; color:#3a2a00}
+.mapa .grupo.on{border-color:var(--accent); box-shadow:0 0 0 2px rgba(35,111,161,.15)}
+@media (max-width:760px){ .mapa{grid-template-columns:1fr} }
+.cols.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){ .cols.two{grid-template-columns:1fr} }
+.figura img{width:100%; height:auto; border:1px solid #d5dee8; border-radius:10px; background:#fff}
+table.reglas{min-width:38rem}
+table.reglas td:first-child{white-space:nowrap}
+</style>
+
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <span class="course">Bases de Datos · Solución</span>
+      <span class="section-name" id="sectionName">Bienvenida</span>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </div>
+</header>
+
+<main id="slides">
+
+  <section class="slide" data-id="bienvenida" data-section="Bienvenida">
+    <p class="eyebrow">Solución</p>
+    <h1>El script de Julián</h1>
+    
+    <p class="lead">El modelo físico completo de Mi plata en orden, en MySQL.</p>
+    <p>Apreciados estudiantes:</p>
+    <p>Aquí encuentran el script con el que Julián construyó el modelo físico completo de la plataforma de Catalina: las 22 tablas del modelo lógico normalizado, con sus llaves y sus restricciones, el poblado con datos del caso, las pruebas de las restricciones y los ejemplos de UPDATE, DELETE y SELECT. Todo el script se ejecutó en MySQL 8.0.</p>
+    <p>Les propongo compararlo con el script que construyeron en el taller. Es probable que encuentren decisiones distintas, como otro tipo de dato o una acción ON DELETE diferente. Cuando eso pase, pregúntense si su decisión permite guardar todos los datos del caso y si respeta las reglas de negocio; si la respuesta es sí, su decisión también es válida.</p>
+
+  </section>
+
+  <section class="slide" data-id="descargas" data-section="Los archivos">
+    <p class="eyebrow">Los archivos</p>
+    <h2>Descargar y ejecutar el script</h2>
+    
+    <p>El script está dividido en cuatro archivos, que se ejecutan en este orden:</p>
+    <ul class="checks">
+      <li><a href="sql/01_creacion_tablas.sql" download>01_creacion_tablas.sql</a>: crea la base de datos <em>mi_plata_en_orden</em> y sus 22 tablas.</li>
+      <li><a href="sql/02_poblado.sql" download>02_poblado.sql</a>: puebla las tablas con datos del caso.</li>
+      <li><a href="sql/03_actualizar_eliminar_consultar.sql" download>03_actualizar_eliminar_consultar.sql</a>: ejemplos de UPDATE, DELETE y SELECT.</li>
+      <li><a href="sql/04_pruebas_restricciones.sql" download>04_pruebas_restricciones.sql</a>: sentencias que incumplen las restricciones, con la respuesta esperada de MySQL.</li>
+    </ul>
+    <p>En MySQL Workbench, abran cada archivo con <em>File &gt; Open SQL Script</em> y ejecútenlo completo. Desde la consola, se ejecutan con <code>source</code> y la ruta del archivo. El primer archivo empieza con <code>DROP DATABASE IF EXISTS</code>, así que se puede volver a ejecutar todas las veces que se necesite para empezar desde cero.</p>
+    <p>El cuarto archivo tiene sentencias que MySQL debe rechazar, así que conviene ejecutarlas una por una, o con la opción de continuar después de un error, para ver cada respuesta.</p>
+
+  </section>
+
+  <section class="slide" data-id="decisiones" data-section="Las decisiones">
+    <p class="eyebrow">Las decisiones</p>
+    <h2>Las decisiones de Julián</h2>
+    
+    <div class="cols two">
+      <div class="panel"><h3>Tipos de datos</h3><p>Los valores de dinero usan <code>DECIMAL(14,2)</code>, que guarda montos exactos. Los códigos de moneda y de país usan <code>CHAR</code>, porque tienen longitud fija, y son la llave primaria de su tabla. Los meses del presupuesto y de las cuotas se guardan como el primer día del mes, en una columna <code>DATE</code>, con la restricción <code>CHECK (DAY(mes) = 1)</code>.</p></div>
+      <div class="panel"><h3>Valores vacíos</h3><p>Admiten <code>NULL</code> las llaves foráneas de las relaciones opcionales (la entidad de la cuenta, el tercero y el pago fijo del movimiento, la categoría padre y la persona de una categoría del sistema) y los datos que solo aplican a algunos registros, como el cupo, el día de corte y el día de pago.</p></div>
+      <div class="panel"><h3>Acciones de las llaves foráneas</h3><p><code>RESTRICT</code> en la mayoría de las relaciones, para proteger la información registrada. <code>CASCADE</code> en las tablas que dependen por completo de otra: cuota, tasa_cambio, movimiento_etiqueta y presupuesto_categoria. <code>SET NULL</code> en las relaciones opcionales: entidad de la cuenta, tercero y pago fijo del movimiento.</p></div>
+      <div class="panel"><h3>Reglas de negocio</h3><p>Las reglas que se verifican en los datos de una fila quedaron como restricciones <code>NOT NULL</code>, <code>UNIQUE</code>, <code>CHECK</code> o <code>DEFAULT</code>. Las que comparan datos de varias tablas, como RN_004, RN_010 y la parte de RN_011 que pide que las dos cuentas de un traslado sean de la misma persona, se verifican en la aplicación o con disparadores.</p></div>
+    </div>
+    <p>Una particularidad de MySQL: una columna que se usa en una restricción <code>CHECK</code> no puede tener una llave foránea con acción en cascada. Por eso las dos llaves del traslado, que se comparan en <code>CHECK (id_cuenta_origen &lt;&gt; id_cuenta_destino)</code>, usan <code>RESTRICT</code> también al actualizar.</p>
+
+  </section>
+
+  <section class="slide" data-id="orden" data-section="Los archivos">
+    <p class="eyebrow">Los archivos</p>
+    <h2>El orden de creación</h2>
+    
+    <p>Las tablas se crean, y se pueblan, de manera que cada una exista antes que las tablas que hacen referencia a ella:</p>
+    <ul class="flow">
+      <li><b>Sin llaves foráneas</b><small>ciudad, pais, tipo_entidad, moneda, tipo_cuenta, tipo_tercero</small></li>
+      <li><b>Primer nivel</b><small>persona, entidad_financiera, tasa_cambio</small></li>
+      <li><b>Cuentas y catálogos de la persona</b><small>cuenta, categoria, tercero, etiqueta</small></li>
+      <li><b>Lo que usa las cuentas</b><small>pago_fijo, movimiento, traslado, presupuesto, meta_ahorro</small></li>
+      <li><b>Lo que depende de esos registros</b><small>cuota, movimiento_etiqueta, presupuesto_categoria, aporte</small></li>
+    </ul>
+    <p>La categoría hace referencia a sí misma, por las subcategorías. Por eso, al poblarla, primero se agregan las categorías principales y después las subcategorías que las usan.</p>
+
+  </section>
+
+  <section class="slide" data-id="creacion" data-section="El script">
+    <p class="eyebrow">El script</p>
+    <h2>Creación de las tablas</h2>
+    
+    <p>Script completo de creación, con los comentarios que relacionan cada restricción con su regla de negocio:</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code1">Copiar</button><pre class="code" id="code1" style="max-height:34rem"><code><span class="cm">-- ============================================================</span>
+<span class="cm">-- Mi plata en orden · Modelo físico</span>
+<span class="cm">-- Script de creación de tablas (MySQL 8.0.16 o superior)</span>
+<span class="cm">-- ============================================================</span>
+
+<span class="kw">DROP DATABASE</span> <span class="kw">IF EXISTS</span> mi_plata_en_orden;
+<span class="kw">CREATE DATABASE</span> mi_plata_en_orden <span class="kw">CHARACTER SET</span> utf8mb4 <span class="kw">COLLATE</span> utf8mb4_spanish_ci;
+<span class="kw">USE</span> mi_plata_en_orden;
+<span class="kw">SET</span> NAMES utf8mb4;
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Tablas sin llaves foráneas (se crean primero)</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="kw">CREATE TABLE</span> ciudad (
+  id_ciudad   <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  nombre      <span class="ty">VARCHAR</span>(60)  <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_ciudad),
+  <span class="kw">CONSTRAINT</span> uq_ciudad_nombre <span class="kw">UNIQUE</span> (nombre)
+);
+
+<span class="kw">CREATE TABLE</span> pais (
+  codigo_pais <span class="ty">CHAR</span>(2)     <span class="kw">NOT NULL</span>,
+  nombre      <span class="ty">VARCHAR</span>(60) <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (codigo_pais),
+  <span class="kw">CONSTRAINT</span> uq_pais_nombre <span class="kw">UNIQUE</span> (nombre)
+);
+
+<span class="kw">CREATE TABLE</span> tipo_entidad (
+  id_tipo_entidad <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  nombre          <span class="ty">VARCHAR</span>(40)  <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_tipo_entidad),
+  <span class="kw">CONSTRAINT</span> uq_tipo_entidad_nombre <span class="kw">UNIQUE</span> (nombre)
+);
+
+<span class="kw">CREATE TABLE</span> moneda (
+  codigo_moneda <span class="ty">CHAR</span>(3)     <span class="kw">NOT NULL</span>,
+  nombre        <span class="ty">VARCHAR</span>(40) <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (codigo_moneda)
+);
+
+<span class="cm">-- RN_005: cada tipo de cuenta es de clase activo o pasivo</span>
+<span class="kw">CREATE TABLE</span> tipo_cuenta (
+  id_tipo_cuenta <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  nombre         <span class="ty">VARCHAR</span>(40)  <span class="kw">NOT NULL</span>,
+  clase          <span class="ty">VARCHAR</span>(10)  <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_tipo_cuenta),
+  <span class="kw">CONSTRAINT</span> uq_tipo_cuenta_nombre <span class="kw">UNIQUE</span> (nombre),
+  <span class="kw">CONSTRAINT</span> ck_tipo_cuenta_clase <span class="kw">CHECK</span> (clase <span class="kw">IN</span> (<span class="st">&#x27;activo&#x27;</span>, <span class="st">&#x27;pasivo&#x27;</span>))
+);
+
+<span class="cm">-- RN_020: los tipos de tercero son comercio, cliente, empleador u otro</span>
+<span class="kw">CREATE TABLE</span> tipo_tercero (
+  id_tipo_tercero <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  nombre          <span class="ty">VARCHAR</span>(40)  <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_tipo_tercero),
+  <span class="kw">CONSTRAINT</span> uq_tipo_tercero_nombre <span class="kw">UNIQUE</span> (nombre)
+);
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Personas, entidades financieras y tasas de cambio</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- RN_001: el correo de cada persona es único</span>
+<span class="kw">CREATE TABLE</span> persona (
+  id_persona         <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_ciudad          <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span>,
+  nombres            <span class="ty">VARCHAR</span>(60)   <span class="kw">NOT NULL</span>,
+  apellidos          <span class="ty">VARCHAR</span>(60)   <span class="kw">NOT NULL</span>,
+  correo             <span class="ty">VARCHAR</span>(100)  <span class="kw">NOT NULL</span>,
+  celular            <span class="ty">VARCHAR</span>(15)   <span class="kw">NULL</span>,
+  fecha_registro     <span class="ty">DATE</span>          <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> (<span class="ty">CURRENT_DATE</span>),
+  tope_gasto_hormiga <span class="ty">DECIMAL</span>(12,2) <span class="kw">NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_persona),
+  <span class="kw">CONSTRAINT</span> uq_persona_correo <span class="kw">UNIQUE</span> (correo),
+  <span class="kw">CONSTRAINT</span> ck_persona_tope <span class="kw">CHECK</span> (tope_gasto_hormiga &gt; 0),
+  <span class="kw">CONSTRAINT</span> fk_persona_ciudad <span class="kw">FOREIGN KEY</span> (id_ciudad)
+    <span class="kw">REFERENCES</span> ciudad (id_ciudad)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="kw">CREATE TABLE</span> entidad_financiera (
+  id_entidad      <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_tipo_entidad <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  codigo_pais     <span class="ty">CHAR</span>(2)      <span class="kw">NOT NULL</span>,
+  nombre          <span class="ty">VARCHAR</span>(80)  <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_entidad),
+  <span class="kw">CONSTRAINT</span> uq_entidad_nombre_pais <span class="kw">UNIQUE</span> (nombre, codigo_pais),
+  <span class="kw">CONSTRAINT</span> fk_entidad_tipo <span class="kw">FOREIGN KEY</span> (id_tipo_entidad)
+    <span class="kw">REFERENCES</span> tipo_entidad (id_tipo_entidad)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_entidad_pais <span class="kw">FOREIGN KEY</span> (codigo_pais)
+    <span class="kw">REFERENCES</span> pais (codigo_pais)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- RN_019: como máximo una tasa de cambio por moneda y fecha (llave compuesta)</span>
+<span class="kw">CREATE TABLE</span> tasa_cambio (
+  codigo_moneda  <span class="ty">CHAR</span>(3)       <span class="kw">NOT NULL</span>,
+  fecha          <span class="ty">DATE</span>          <span class="kw">NOT NULL</span>,
+  valor_en_pesos <span class="ty">DECIMAL</span>(14,4) <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (codigo_moneda, fecha),
+  <span class="kw">CONSTRAINT</span> ck_tasa_valor <span class="kw">CHECK</span> (valor_en_pesos &gt; 0),
+  <span class="kw">CONSTRAINT</span> fk_tasa_moneda <span class="kw">FOREIGN KEY</span> (codigo_moneda)
+    <span class="kw">REFERENCES</span> moneda (codigo_moneda)
+    <span class="kw">ON DELETE</span> <span class="kw">CASCADE</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Cuentas</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- RN_002 y RN_003: cada cuenta tiene una persona y una moneda (NOT NULL)</span>
+<span class="cm">-- RN_004: la entidad financiera es opcional, para el efectivo (NULL)</span>
+<span class="cm">-- RN_006: el estado es activa o cerrada</span>
+<span class="cm">-- RN_007: día de corte y día de pago entre 1 y 31; cupo mayor que cero</span>
+<span class="kw">CREATE TABLE</span> cuenta (
+  id_cuenta           <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_persona          <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  id_tipo_cuenta      <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  id_entidad          <span class="ty">INT UNSIGNED</span>     <span class="kw">NULL</span>,
+  codigo_moneda       <span class="ty">CHAR</span>(3)          <span class="kw">NOT NULL</span>,
+  nombre              <span class="ty">VARCHAR</span>(60)      <span class="kw">NOT NULL</span>,
+  ultimos_cuatro      <span class="ty">CHAR</span>(4)          <span class="kw">NULL</span>,
+  saldo_inicial       <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> 0,
+  fecha_saldo_inicial <span class="ty">DATE</span>             <span class="kw">NOT NULL</span>,
+  estado              <span class="ty">VARCHAR</span>(10)      <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> <span class="st">&#x27;activa&#x27;</span>,
+  cupo                <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NULL</span>,
+  dia_corte           <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NULL</span>,
+  dia_pago            <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_cuenta),
+  <span class="kw">CONSTRAINT</span> uq_cuenta_persona_nombre <span class="kw">UNIQUE</span> (id_persona, nombre),
+  <span class="kw">CONSTRAINT</span> ck_cuenta_estado <span class="kw">CHECK</span> (estado <span class="kw">IN</span> (<span class="st">&#x27;activa&#x27;</span>, <span class="st">&#x27;cerrada&#x27;</span>)),
+  <span class="kw">CONSTRAINT</span> ck_cuenta_cupo <span class="kw">CHECK</span> (cupo &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_cuenta_dia_corte <span class="kw">CHECK</span> (dia_corte <span class="kw">BETWEEN</span> 1 <span class="kw">AND</span> 31),
+  <span class="kw">CONSTRAINT</span> ck_cuenta_dia_pago <span class="kw">CHECK</span> (dia_pago <span class="kw">BETWEEN</span> 1 <span class="kw">AND</span> 31),
+  <span class="kw">CONSTRAINT</span> fk_cuenta_persona <span class="kw">FOREIGN KEY</span> (id_persona)
+    <span class="kw">REFERENCES</span> persona (id_persona)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_cuenta_tipo <span class="kw">FOREIGN KEY</span> (id_tipo_cuenta)
+    <span class="kw">REFERENCES</span> tipo_cuenta (id_tipo_cuenta)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_cuenta_entidad <span class="kw">FOREIGN KEY</span> (id_entidad)
+    <span class="kw">REFERENCES</span> entidad_financiera (id_entidad)
+    <span class="kw">ON DELETE</span> <span class="kw">SET NULL</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_cuenta_moneda <span class="kw">FOREIGN KEY</span> (codigo_moneda)
+    <span class="kw">REFERENCES</span> moneda (codigo_moneda)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Categorías, terceros, etiquetas y pagos fijos</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- RN_008: cada categoría es de ingreso o de gasto</span>
+<span class="cm">-- id_categoria_padre: relación recursiva (subcategorías)</span>
+<span class="cm">-- id_persona vacío: categoría del sistema</span>
+<span class="kw">CREATE TABLE</span> categoria (
+  id_categoria       <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_categoria_padre <span class="ty">INT UNSIGNED</span> <span class="kw">NULL</span>,
+  id_persona         <span class="ty">INT UNSIGNED</span> <span class="kw">NULL</span>,
+  nombre             <span class="ty">VARCHAR</span>(60)  <span class="kw">NOT NULL</span>,
+  naturaleza         <span class="ty">VARCHAR</span>(7)   <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_categoria),
+  <span class="kw">CONSTRAINT</span> ck_categoria_naturaleza <span class="kw">CHECK</span> (naturaleza <span class="kw">IN</span> (<span class="st">&#x27;ingreso&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>)),
+  <span class="kw">CONSTRAINT</span> fk_categoria_padre <span class="kw">FOREIGN KEY</span> (id_categoria_padre)
+    <span class="kw">REFERENCES</span> categoria (id_categoria)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_categoria_persona <span class="kw">FOREIGN KEY</span> (id_persona)
+    <span class="kw">REFERENCES</span> persona (id_persona)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="kw">CREATE TABLE</span> tercero (
+  id_tercero      <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_persona      <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  id_tipo_tercero <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  nombre          <span class="ty">VARCHAR</span>(80)  <span class="kw">NOT NULL</span>,
+  identificacion  <span class="ty">VARCHAR</span>(20)  <span class="kw">NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_tercero),
+  <span class="kw">CONSTRAINT</span> fk_tercero_persona <span class="kw">FOREIGN KEY</span> (id_persona)
+    <span class="kw">REFERENCES</span> persona (id_persona)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_tercero_tipo <span class="kw">FOREIGN KEY</span> (id_tipo_tercero)
+    <span class="kw">REFERENCES</span> tipo_tercero (id_tipo_tercero)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="kw">CREATE TABLE</span> etiqueta (
+  id_etiqueta <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_persona  <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  nombre      <span class="ty">VARCHAR</span>(40)  <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_etiqueta),
+  <span class="kw">CONSTRAINT</span> uq_etiqueta_persona_nombre <span class="kw">UNIQUE</span> (id_persona, nombre),
+  <span class="kw">CONSTRAINT</span> fk_etiqueta_persona <span class="kw">FOREIGN KEY</span> (id_persona)
+    <span class="kw">REFERENCES</span> persona (id_persona)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- RN_016: frecuencia mensual o anual; estado activo o inactivo</span>
+<span class="kw">CREATE TABLE</span> pago_fijo (
+  id_pago_fijo     <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_cuenta        <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  id_categoria     <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  nombre           <span class="ty">VARCHAR</span>(60)      <span class="kw">NOT NULL</span>,
+  valor_aproximado <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NOT NULL</span>,
+  dia_pago         <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  frecuencia       <span class="ty">VARCHAR</span>(10)      <span class="kw">NOT NULL</span>,
+  estado           <span class="ty">VARCHAR</span>(10)      <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> <span class="st">&#x27;activo&#x27;</span>,
+  <span class="kw">PRIMARY KEY</span> (id_pago_fijo),
+  <span class="kw">CONSTRAINT</span> ck_pago_valor <span class="kw">CHECK</span> (valor_aproximado &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_pago_dia <span class="kw">CHECK</span> (dia_pago <span class="kw">BETWEEN</span> 1 <span class="kw">AND</span> 31),
+  <span class="kw">CONSTRAINT</span> ck_pago_frecuencia <span class="kw">CHECK</span> (frecuencia <span class="kw">IN</span> (<span class="st">&#x27;mensual&#x27;</span>, <span class="st">&#x27;anual&#x27;</span>)),
+  <span class="kw">CONSTRAINT</span> ck_pago_estado <span class="kw">CHECK</span> (estado <span class="kw">IN</span> (<span class="st">&#x27;activo&#x27;</span>, <span class="st">&#x27;inactivo&#x27;</span>)),
+  <span class="kw">CONSTRAINT</span> fk_pago_cuenta <span class="kw">FOREIGN KEY</span> (id_cuenta)
+    <span class="kw">REFERENCES</span> cuenta (id_cuenta)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_pago_categoria <span class="kw">FOREIGN KEY</span> (id_categoria)
+    <span class="kw">REFERENCES</span> categoria (id_categoria)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Movimientos, cuotas y etiquetas de los movimientos</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- RN_008: cada movimiento tiene una sola categoría (NOT NULL)</span>
+<span class="cm">-- RN_009: el valor es mayor que cero</span>
+<span class="cm">-- RN_014: el número de cuotas es mayor o igual a uno</span>
+<span class="kw">CREATE TABLE</span> movimiento (
+  id_movimiento    <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_cuenta        <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  id_categoria     <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  id_tercero       <span class="ty">INT UNSIGNED</span>     <span class="kw">NULL</span>,
+  id_pago_fijo     <span class="ty">INT UNSIGNED</span>     <span class="kw">NULL</span>,
+  fecha_ocurrencia <span class="ty">DATE</span>             <span class="kw">NOT NULL</span>,
+  fecha_registro   <span class="ty">DATETIME</span>         <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> <span class="ty">CURRENT_TIMESTAMP</span>,
+  valor            <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NOT NULL</span>,
+  descripcion      <span class="ty">VARCHAR</span>(150)     <span class="kw">NULL</span>,
+  numero_cuotas    <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NULL</span>,
+  tasa_interes     <span class="ty">DECIMAL</span>(5,2)     <span class="kw">NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_movimiento),
+  <span class="kw">CONSTRAINT</span> ck_movimiento_valor <span class="kw">CHECK</span> (valor &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_movimiento_cuotas <span class="kw">CHECK</span> (numero_cuotas &gt;= 1),
+  <span class="kw">CONSTRAINT</span> ck_movimiento_tasa <span class="kw">CHECK</span> (tasa_interes &gt;= 0),
+  <span class="kw">CONSTRAINT</span> fk_movimiento_cuenta <span class="kw">FOREIGN KEY</span> (id_cuenta)
+    <span class="kw">REFERENCES</span> cuenta (id_cuenta)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_movimiento_categoria <span class="kw">FOREIGN KEY</span> (id_categoria)
+    <span class="kw">REFERENCES</span> categoria (id_categoria)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_movimiento_tercero <span class="kw">FOREIGN KEY</span> (id_tercero)
+    <span class="kw">REFERENCES</span> tercero (id_tercero)
+    <span class="kw">ON DELETE</span> <span class="kw">SET NULL</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_movimiento_pago <span class="kw">FOREIGN KEY</span> (id_pago_fijo)
+    <span class="kw">REFERENCES</span> pago_fijo (id_pago_fijo)
+    <span class="kw">ON DELETE</span> <span class="kw">SET NULL</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- Concepto débil: llave compuesta (id_movimiento, numero)</span>
+<span class="cm">-- RN_015: el estado de una cuota es pagada o pendiente</span>
+<span class="kw">CREATE TABLE</span> cuota (
+  id_movimiento         <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  numero                <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  mes                   <span class="ty">DATE</span>             <span class="kw">NOT NULL</span>,
+  capital               <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NOT NULL</span>,
+  intereses_proyectados <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> 0,
+  estado                <span class="ty">VARCHAR</span>(10)      <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> <span class="st">&#x27;pendiente&#x27;</span>,
+  <span class="kw">PRIMARY KEY</span> (id_movimiento, numero),
+  <span class="kw">CONSTRAINT</span> ck_cuota_numero <span class="kw">CHECK</span> (numero &gt;= 1),
+  <span class="kw">CONSTRAINT</span> ck_cuota_mes <span class="kw">CHECK</span> (<span class="ty">DAY</span>(mes) = 1),
+  <span class="kw">CONSTRAINT</span> ck_cuota_capital <span class="kw">CHECK</span> (capital &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_cuota_intereses <span class="kw">CHECK</span> (intereses_proyectados &gt;= 0),
+  <span class="kw">CONSTRAINT</span> ck_cuota_estado <span class="kw">CHECK</span> (estado <span class="kw">IN</span> (<span class="st">&#x27;pagada&#x27;</span>, <span class="st">&#x27;pendiente&#x27;</span>)),
+  <span class="kw">CONSTRAINT</span> fk_cuota_movimiento <span class="kw">FOREIGN KEY</span> (id_movimiento)
+    <span class="kw">REFERENCES</span> movimiento (id_movimiento)
+    <span class="kw">ON DELETE</span> <span class="kw">CASCADE</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- Tabla intermedia de la relación de muchos a muchos</span>
+<span class="kw">CREATE TABLE</span> movimiento_etiqueta (
+  id_movimiento <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  id_etiqueta   <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_movimiento, id_etiqueta),
+  <span class="kw">CONSTRAINT</span> fk_me_movimiento <span class="kw">FOREIGN KEY</span> (id_movimiento)
+    <span class="kw">REFERENCES</span> movimiento (id_movimiento)
+    <span class="kw">ON DELETE</span> <span class="kw">CASCADE</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_me_etiqueta <span class="kw">FOREIGN KEY</span> (id_etiqueta)
+    <span class="kw">REFERENCES</span> etiqueta (id_etiqueta)
+    <span class="kw">ON DELETE</span> <span class="kw">CASCADE</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Traslados entre cuentas</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- RN_011: origen y destino distintos; valores mayores que cero</span>
+<span class="cm">-- (que ambas cuentas sean de la misma persona se valida en la aplicación</span>
+<span class="cm">--  o con un disparador, porque compara datos de otra tabla)</span>
+<span class="cm">-- En MySQL, una columna que se usa en un CHECK no puede tener una llave foránea</span>
+<span class="cm">-- con acción en cascada; por eso estas dos llaves usan RESTRICT también al actualizar.</span>
+<span class="kw">CREATE TABLE</span> traslado (
+  id_traslado       <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_cuenta_origen  <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span>,
+  id_cuenta_destino <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span>,
+  fecha             <span class="ty">DATE</span>          <span class="kw">NOT NULL</span>,
+  valor_sale        <span class="ty">DECIMAL</span>(14,2) <span class="kw">NOT NULL</span>,
+  valor_llega       <span class="ty">DECIMAL</span>(14,2) <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_traslado),
+  <span class="kw">CONSTRAINT</span> ck_traslado_cuentas <span class="kw">CHECK</span> (id_cuenta_origen &lt;&gt; id_cuenta_destino),
+  <span class="kw">CONSTRAINT</span> ck_traslado_sale <span class="kw">CHECK</span> (valor_sale &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_traslado_llega <span class="kw">CHECK</span> (valor_llega &gt; 0),
+  <span class="kw">CONSTRAINT</span> fk_traslado_origen <span class="kw">FOREIGN KEY</span> (id_cuenta_origen)
+    <span class="kw">REFERENCES</span> cuenta (id_cuenta)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">RESTRICT</span>,
+  <span class="kw">CONSTRAINT</span> fk_traslado_destino <span class="kw">FOREIGN KEY</span> (id_cuenta_destino)
+    <span class="kw">REFERENCES</span> cuenta (id_cuenta)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">RESTRICT</span>
+);
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Presupuestos</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- RN_012: como máximo un presupuesto por persona y mes</span>
+<span class="kw">CREATE TABLE</span> presupuesto (
+  id_presupuesto <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_persona     <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  mes            <span class="ty">DATE</span>         <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_presupuesto),
+  <span class="kw">CONSTRAINT</span> uq_presupuesto_persona_mes <span class="kw">UNIQUE</span> (id_persona, mes),
+  <span class="kw">CONSTRAINT</span> ck_presupuesto_mes <span class="kw">CHECK</span> (<span class="ty">DAY</span>(mes) = 1),
+  <span class="kw">CONSTRAINT</span> fk_presupuesto_persona <span class="kw">FOREIGN KEY</span> (id_persona)
+    <span class="kw">REFERENCES</span> persona (id_persona)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- RN_012: cada categoría aparece una sola vez en un presupuesto (llave compuesta)</span>
+<span class="cm">-- RN_013: porcentaje de alerta entre 1 y 100, con 80 por omisión</span>
+<span class="kw">CREATE TABLE</span> presupuesto_categoria (
+  id_presupuesto    <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  id_categoria      <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  valor_planeado    <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NOT NULL</span>,
+  porcentaje_alerta <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> 80,
+  <span class="kw">PRIMARY KEY</span> (id_presupuesto, id_categoria),
+  <span class="kw">CONSTRAINT</span> ck_pc_valor <span class="kw">CHECK</span> (valor_planeado &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_pc_alerta <span class="kw">CHECK</span> (porcentaje_alerta <span class="kw">BETWEEN</span> 1 <span class="kw">AND</span> 100),
+  <span class="kw">CONSTRAINT</span> fk_pc_presupuesto <span class="kw">FOREIGN KEY</span> (id_presupuesto)
+    <span class="kw">REFERENCES</span> presupuesto (id_presupuesto)
+    <span class="kw">ON DELETE</span> <span class="kw">CASCADE</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_pc_categoria <span class="kw">FOREIGN KEY</span> (id_categoria)
+    <span class="kw">REFERENCES</span> categoria (id_categoria)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- Metas de ahorro y aportes</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- RN_017: valor necesario mayor que cero; estado activa, cumplida o cancelada</span>
+<span class="kw">CREATE TABLE</span> meta_ahorro (
+  id_meta         <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_persona      <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span>,
+  nombre          <span class="ty">VARCHAR</span>(60)   <span class="kw">NOT NULL</span>,
+  valor_necesario <span class="ty">DECIMAL</span>(14,2) <span class="kw">NOT NULL</span>,
+  fecha_objetivo  <span class="ty">DATE</span>          <span class="kw">NOT NULL</span>,
+  estado          <span class="ty">VARCHAR</span>(10)   <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> <span class="st">&#x27;activa&#x27;</span>,
+  <span class="kw">PRIMARY KEY</span> (id_meta),
+  <span class="kw">CONSTRAINT</span> ck_meta_valor <span class="kw">CHECK</span> (valor_necesario &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_meta_estado <span class="kw">CHECK</span> (estado <span class="kw">IN</span> (<span class="st">&#x27;activa&#x27;</span>, <span class="st">&#x27;cumplida&#x27;</span>, <span class="st">&#x27;cancelada&#x27;</span>)),
+  <span class="kw">CONSTRAINT</span> fk_meta_persona <span class="kw">FOREIGN KEY</span> (id_persona)
+    <span class="kw">REFERENCES</span> persona (id_persona)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);
+
+<span class="cm">-- RN_018: cada aporte corresponde a una meta; valor mayor que cero; tipo aporte o retiro</span>
+<span class="kw">CREATE TABLE</span> aporte (
+  id_aporte <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_meta   <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span>,
+  id_cuenta <span class="ty">INT UNSIGNED</span>  <span class="kw">NOT NULL</span>,
+  fecha     <span class="ty">DATE</span>          <span class="kw">NOT NULL</span>,
+  valor     <span class="ty">DECIMAL</span>(14,2) <span class="kw">NOT NULL</span>,
+  tipo      <span class="ty">VARCHAR</span>(7)    <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_aporte),
+  <span class="kw">CONSTRAINT</span> ck_aporte_valor <span class="kw">CHECK</span> (valor &gt; 0),
+  <span class="kw">CONSTRAINT</span> ck_aporte_tipo <span class="kw">CHECK</span> (tipo <span class="kw">IN</span> (<span class="st">&#x27;aporte&#x27;</span>, <span class="st">&#x27;retiro&#x27;</span>)),
+  <span class="kw">CONSTRAINT</span> fk_aporte_meta <span class="kw">FOREIGN KEY</span> (id_meta)
+    <span class="kw">REFERENCES</span> meta_ahorro (id_meta)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>,
+  <span class="kw">CONSTRAINT</span> fk_aporte_cuenta <span class="kw">FOREIGN KEY</span> (id_cuenta)
+    <span class="kw">REFERENCES</span> cuenta (id_cuenta)
+    <span class="kw">ON DELETE</span> <span class="kw">RESTRICT</span> <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span>
+);</code></pre></div>
+
+  </section>
+
+  <section class="slide" data-id="poblado" data-section="El script">
+    <p class="eyebrow">El script</p>
+    <h2>Poblado de las tablas</h2>
+    
+    <p>Los datos siguen la historia que contó Catalina: el arriendo, el mercado, el tinto, la nevera a tres cuotas, el viaje a Cartagena con sus etiquetas y la meta de ahorro con sus aportes y su retiro.</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code2">Copiar</button><pre class="code" id="code2" style="max-height:34rem"><code><span class="cm">-- ============================================================</span>
+<span class="cm">-- Mi plata en orden · Poblado de las tablas</span>
+<span class="cm">-- Las tablas se pueblan en el mismo orden en que se crearon:</span>
+<span class="cm">-- primero las que no tienen llaves foráneas.</span>
+<span class="cm">-- ============================================================</span>
+
+<span class="kw">USE</span> mi_plata_en_orden;
+<span class="kw">SET</span> NAMES utf8mb4;
+
+<span class="kw">INSERT INTO</span> ciudad (nombre) <span class="kw">VALUES</span>
+  (<span class="st">&#x27;Bogotá&#x27;</span>), (<span class="st">&#x27;Medellín&#x27;</span>), (<span class="st">&#x27;Cali&#x27;</span>), (<span class="st">&#x27;Barranquilla&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> pais (codigo_pais, nombre) <span class="kw">VALUES</span>
+  (<span class="st">&#x27;CO&#x27;</span>, <span class="st">&#x27;Colombia&#x27;</span>), (<span class="st">&#x27;US&#x27;</span>, <span class="st">&#x27;Estados Unidos&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> tipo_entidad (nombre) <span class="kw">VALUES</span>
+  (<span class="st">&#x27;banco&#x27;</span>), (<span class="st">&#x27;cooperativa&#x27;</span>), (<span class="st">&#x27;billetera digital&#x27;</span>), (<span class="st">&#x27;comisionista de bolsa&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> moneda (codigo_moneda, nombre) <span class="kw">VALUES</span>
+  (<span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Peso colombiano&#x27;</span>), (<span class="st">&#x27;USD&#x27;</span>, <span class="st">&#x27;Dólar estadounidense&#x27;</span>);
+
+<span class="cm">-- RN_005: los cinco primeros tipos son de clase activo y los dos últimos, de clase pasivo</span>
+<span class="kw">INSERT INTO</span> tipo_cuenta (nombre, clase) <span class="kw">VALUES</span>
+  (<span class="st">&#x27;ahorros&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (<span class="st">&#x27;corriente&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (<span class="st">&#x27;billetera digital&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (<span class="st">&#x27;inversión&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (<span class="st">&#x27;efectivo&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (<span class="st">&#x27;tarjeta de crédito&#x27;</span>, <span class="st">&#x27;pasivo&#x27;</span>),
+  (<span class="st">&#x27;crédito&#x27;</span>, <span class="st">&#x27;pasivo&#x27;</span>);
+
+<span class="cm">-- RN_020</span>
+<span class="kw">INSERT INTO</span> tipo_tercero (nombre) <span class="kw">VALUES</span>
+  (<span class="st">&#x27;comercio&#x27;</span>), (<span class="st">&#x27;cliente&#x27;</span>), (<span class="st">&#x27;empleador&#x27;</span>), (<span class="st">&#x27;otro&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> persona (id_ciudad, nombres, apellidos, correo, celular, fecha_registro, tope_gasto_hormiga) <span class="kw">VALUES</span>
+  (1, <span class="st">&#x27;Sofía&#x27;</span>, <span class="st">&#x27;Ramírez Gómez&#x27;</span>, <span class="st">&#x27;sofia.r@correo.com&#x27;</span>, <span class="st">&#x27;3001234567&#x27;</span>, <span class="st">&#x27;2026-08-01&#x27;</span>, 15000),
+  (2, <span class="st">&#x27;Andrés Felipe&#x27;</span>, <span class="st">&#x27;Torres Díaz&#x27;</span>, <span class="st">&#x27;aftorres@correo.com&#x27;</span>, <span class="st">&#x27;3152221188&#x27;</span>, <span class="st">&#x27;2026-09-12&#x27;</span>, <span class="kw">NULL</span>),
+  (3, <span class="st">&#x27;Marta Lucía&#x27;</span>, <span class="st">&#x27;Rojas Peña&#x27;</span>, <span class="st">&#x27;mlrojas@correo.com&#x27;</span>, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-05&#x27;</span>, 10000);
+
+<span class="kw">INSERT INTO</span> entidad_financiera (id_tipo_entidad, codigo_pais, nombre) <span class="kw">VALUES</span>
+  (1, <span class="st">&#x27;CO&#x27;</span>, <span class="st">&#x27;Banco Andino&#x27;</span>),
+  (2, <span class="st">&#x27;CO&#x27;</span>, <span class="st">&#x27;Cooperativa Futuro&#x27;</span>),
+  (3, <span class="st">&#x27;CO&#x27;</span>, <span class="st">&#x27;Billetera Ágil&#x27;</span>),
+  (1, <span class="st">&#x27;US&#x27;</span>, <span class="st">&#x27;Northern Bank&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> tasa_cambio (codigo_moneda, fecha, valor_en_pesos) <span class="kw">VALUES</span>
+  (<span class="st">&#x27;USD&#x27;</span>, <span class="st">&#x27;2026-10-01&#x27;</span>, 3900.5000),
+  (<span class="st">&#x27;USD&#x27;</span>, <span class="st">&#x27;2026-10-15&#x27;</span>, 3925.1000),
+  (<span class="st">&#x27;USD&#x27;</span>, <span class="st">&#x27;2026-11-01&#x27;</span>, 3880.0000);
+
+<span class="cm">-- La cuenta de efectivo no tiene entidad financiera (RN_004): id_entidad queda en NULL.</span>
+<span class="cm">-- El cupo, el día de corte y el día de pago solo se registran en la tarjeta de crédito (RN_007).</span>
+<span class="kw">INSERT INTO</span> cuenta (id_persona, id_tipo_cuenta, id_entidad, codigo_moneda, nombre, ultimos_cuatro,
+                    saldo_inicial, fecha_saldo_inicial, estado, cupo, dia_corte, dia_pago) <span class="kw">VALUES</span>
+  (1, 1, 1, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Ahorros de la casa&#x27;</span>, <span class="st">&#x27;4521&#x27;</span>, 2500000, <span class="st">&#x27;2026-08-01&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 5, <span class="kw">NULL</span>, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Efectivo&#x27;</span>, <span class="kw">NULL</span>, 150000, <span class="st">&#x27;2026-08-01&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 6, 1, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Tarjeta del supermercado&#x27;</span>, <span class="st">&#x27;7788&#x27;</span>, 0, <span class="st">&#x27;2026-08-01&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, 5000000, 25, 10),
+  (1, 1, 2, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Ahorro para el viaje&#x27;</span>, <span class="st">&#x27;0912&#x27;</span>, 0, <span class="st">&#x27;2026-08-01&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 3, 3, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Billetera&#x27;</span>, <span class="kw">NULL</span>, 80000, <span class="st">&#x27;2026-08-01&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (2, 1, 1, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Cuenta de nómina&#x27;</span>, <span class="st">&#x27;3307&#x27;</span>, 1200000, <span class="st">&#x27;2026-09-12&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (2, 1, 4, <span class="st">&#x27;USD&#x27;</span>, <span class="st">&#x27;Ahorros en dólares&#x27;</span>, <span class="st">&#x27;6650&#x27;</span>, 500, <span class="st">&#x27;2026-09-12&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (3, 5, <span class="kw">NULL</span>, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Efectivo&#x27;</span>, <span class="kw">NULL</span>, 60000, <span class="st">&#x27;2026-10-05&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>);
+
+<span class="cm">-- Primero las categorías principales y después las subcategorías, que las referencian.</span>
+<span class="cm">-- id_persona en NULL: categorías del sistema.</span>
+<span class="kw">INSERT INTO</span> categoria (id_categoria_padre, id_persona, nombre, naturaleza) <span class="kw">VALUES</span>
+  (<span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;Salario&#x27;</span>, <span class="st">&#x27;ingreso&#x27;</span>),
+  (<span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;Honorarios&#x27;</span>, <span class="st">&#x27;ingreso&#x27;</span>),
+  (<span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;Vivienda&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (<span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;Alimentación&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (4, <span class="kw">NULL</span>, <span class="st">&#x27;Mercado&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (4, <span class="kw">NULL</span>, <span class="st">&#x27;Restaurantes&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (4, <span class="kw">NULL</span>, <span class="st">&#x27;Cafetería&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (<span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;Transporte&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (3, <span class="kw">NULL</span>, <span class="st">&#x27;Servicios públicos&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (<span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;Entretenimiento&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (<span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;Hogar&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (<span class="kw">NULL</span>, 1, <span class="st">&#x27;Mascotas&#x27;</span>, <span class="st">&#x27;gasto&#x27;</span>),
+  (<span class="kw">NULL</span>, 2, <span class="st">&#x27;Venta de artesanías&#x27;</span>, <span class="st">&#x27;ingreso&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> tercero (id_persona, id_tipo_tercero, nombre, identificacion) <span class="kw">VALUES</span>
+  (1, 1, <span class="st">&#x27;Supermercado La Canasta&#x27;</span>, <span class="st">&#x27;900123456&#x27;</span>),
+  (1, 3, <span class="st">&#x27;Datos Claros S. A. S.&#x27;</span>, <span class="st">&#x27;901555333&#x27;</span>),
+  (1, 4, <span class="st">&#x27;Inmobiliaria Techo&#x27;</span>, <span class="kw">NULL</span>),
+  (1, 1, <span class="st">&#x27;Aerolínea Cóndor&#x27;</span>, <span class="st">&#x27;860000111&#x27;</span>),
+  (1, 1, <span class="st">&#x27;Hotel Mar Azul&#x27;</span>, <span class="kw">NULL</span>),
+  (1, 1, <span class="st">&#x27;Almacén Hogar Total&#x27;</span>, <span class="st">&#x27;900777888&#x27;</span>),
+  (2, 2, <span class="st">&#x27;Tienda Raíces&#x27;</span>, <span class="kw">NULL</span>);
+
+<span class="kw">INSERT INTO</span> etiqueta (id_persona, nombre) <span class="kw">VALUES</span>
+  (1, <span class="st">&#x27;viaje Cartagena&#x27;</span>), (1, <span class="st">&#x27;vacaciones&#x27;</span>), (1, <span class="st">&#x27;familia&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> pago_fijo (id_cuenta, id_categoria, nombre, valor_aproximado, dia_pago, frecuencia, estado) <span class="kw">VALUES</span>
+  (1, 3, <span class="st">&#x27;Arriendo&#x27;</span>, 1200000, 5, <span class="st">&#x27;mensual&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (1, 9, <span class="st">&#x27;Internet&#x27;</span>, 95000, 15, <span class="st">&#x27;mensual&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (1, 8, <span class="st">&#x27;Seguro del carro&#x27;</span>, 1100000, 20, <span class="st">&#x27;anual&#x27;</span>, <span class="st">&#x27;activo&#x27;</span>),
+  (3, 10, <span class="st">&#x27;Gimnasio&#x27;</span>, 120000, 1, <span class="st">&#x27;mensual&#x27;</span>, <span class="st">&#x27;inactivo&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> movimiento (id_cuenta, id_categoria, id_tercero, id_pago_fijo, fecha_ocurrencia,
+                        fecha_registro, valor, descripcion, numero_cuotas, tasa_interes) <span class="kw">VALUES</span>
+  (1, 1, 2, <span class="kw">NULL</span>, <span class="st">&#x27;2026-09-30&#x27;</span>, <span class="st">&#x27;2026-09-30 18:10:00&#x27;</span>, 4800000, <span class="st">&#x27;Salario de septiembre&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 3, 3, 1, <span class="st">&#x27;2026-10-05&#x27;</span>, <span class="st">&#x27;2026-10-05 09:00:00&#x27;</span>, 1200000, <span class="st">&#x27;Arriendo de octubre&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 6, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-03&#x27;</span>, <span class="st">&#x27;2026-10-03 21:15:00&#x27;</span>, 18000, <span class="st">&#x27;Domicilio&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (2, 7, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-03&#x27;</span>, <span class="st">&#x27;2026-10-04 08:00:00&#x27;</span>, 4500, <span class="st">&#x27;Tinto&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 5, 1, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-06&#x27;</span>, <span class="st">&#x27;2026-10-06 19:30:00&#x27;</span>, 320000, <span class="st">&#x27;Mercado&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 9, <span class="kw">NULL</span>, 2, <span class="st">&#x27;2026-10-15&#x27;</span>, <span class="st">&#x27;2026-10-15 07:45:00&#x27;</span>, 95000, <span class="st">&#x27;Internet de octubre&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (3, 8, 4, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-12&#x27;</span>, <span class="st">&#x27;2026-10-12 12:00:00&#x27;</span>, 640000, <span class="st">&#x27;Tiquetes aéreos&#x27;</span>, 1, 0),
+  (3, 10, 5, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-12&#x27;</span>, <span class="st">&#x27;2026-10-12 12:20:00&#x27;</span>, 900000, <span class="st">&#x27;Hotel&#x27;</span>, 1, 0),
+  (3, 11, 6, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-20&#x27;</span>, <span class="st">&#x27;2026-10-20 16:40:00&#x27;</span>, 1800000, <span class="st">&#x27;Nevera&#x27;</span>, 3, 28.50),
+  (2, 7, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-21&#x27;</span>, <span class="st">&#x27;2026-10-21 10:05:00&#x27;</span>, 3500, <span class="st">&#x27;Empanada&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (5, 12, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-22&#x27;</span>, <span class="st">&#x27;2026-10-22 17:00:00&#x27;</span>, 85000, <span class="st">&#x27;Concentrado para la perra&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (1, 5, 1, <span class="kw">NULL</span>, <span class="st">&#x27;2026-11-03&#x27;</span>, <span class="st">&#x27;2026-11-03 19:00:00&#x27;</span>, 280000, <span class="st">&#x27;Mercado&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (6, 13, 7, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-10&#x27;</span>, <span class="st">&#x27;2026-10-10 15:00:00&#x27;</span>, 450000, <span class="st">&#x27;Venta de mochilas&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>),
+  (6, 6, <span class="kw">NULL</span>, <span class="kw">NULL</span>, <span class="st">&#x27;2026-10-11&#x27;</span>, <span class="st">&#x27;2026-10-11 13:30:00&#x27;</span>, 42000, <span class="st">&#x27;Almuerzo&#x27;</span>, <span class="kw">NULL</span>, <span class="kw">NULL</span>);
+
+<span class="cm">-- Las cuotas referencian movimientos que ya existen (7, 8 y 9)</span>
+<span class="kw">INSERT INTO</span> cuota (id_movimiento, numero, mes, capital, intereses_proyectados, estado) <span class="kw">VALUES</span>
+  (7, 1, <span class="st">&#x27;2026-11-01&#x27;</span>, 640000, 0, <span class="st">&#x27;pagada&#x27;</span>),
+  (8, 1, <span class="st">&#x27;2026-11-01&#x27;</span>, 900000, 0, <span class="st">&#x27;pagada&#x27;</span>),
+  (9, 1, <span class="st">&#x27;2026-11-01&#x27;</span>, 600000, 37980, <span class="st">&#x27;pagada&#x27;</span>),
+  (9, 2, <span class="st">&#x27;2026-12-01&#x27;</span>, 600000, 25320, <span class="st">&#x27;pendiente&#x27;</span>),
+  (9, 3, <span class="st">&#x27;2027-01-01&#x27;</span>, 600000, 12660, <span class="st">&#x27;pendiente&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> movimiento_etiqueta (id_movimiento, id_etiqueta) <span class="kw">VALUES</span>
+  (7, 1), (7, 2), (8, 1), (8, 2), (8, 3);
+
+<span class="kw">INSERT INTO</span> traslado (id_cuenta_origen, id_cuenta_destino, fecha, valor_sale, valor_llega) <span class="kw">VALUES</span>
+  (1, 4, <span class="st">&#x27;2026-10-01&#x27;</span>, 500000, 500000),
+  (1, 3, <span class="st">&#x27;2026-11-10&#x27;</span>, 2177980, 2177980),
+  (6, 7, <span class="st">&#x27;2026-10-20&#x27;</span>, 392510, 100);
+
+<span class="kw">INSERT INTO</span> presupuesto (id_persona, mes) <span class="kw">VALUES</span>
+  (1, <span class="st">&#x27;2026-10-01&#x27;</span>), (1, <span class="st">&#x27;2026-11-01&#x27;</span>), (2, <span class="st">&#x27;2026-10-01&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> presupuesto_categoria (id_presupuesto, id_categoria, valor_planeado, porcentaje_alerta) <span class="kw">VALUES</span>
+  (1, 3, 1200000, 90),
+  (1, 5, 600000, 80),
+  (1, 6, 150000, 80),
+  (1, 7, 40000, 70),
+  (1, 9, 200000, 80),
+  (2, 5, 600000, 80),
+  (2, 6, 120000, 80),
+  (3, 6, 200000, 80);
+
+<span class="kw">INSERT INTO</span> meta_ahorro (id_persona, nombre, valor_necesario, fecha_objetivo, estado) <span class="kw">VALUES</span>
+  (1, <span class="st">&#x27;Viaje a Cartagena&#x27;</span>, 3000000, <span class="st">&#x27;2027-06-30&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>),
+  (1, <span class="st">&#x27;Fondo de emergencia&#x27;</span>, 6000000, <span class="st">&#x27;2027-12-31&#x27;</span>, <span class="st">&#x27;activa&#x27;</span>),
+  (2, <span class="st">&#x27;Computador&#x27;</span>, 3500000, <span class="st">&#x27;2026-09-30&#x27;</span>, <span class="st">&#x27;cumplida&#x27;</span>);
+
+<span class="kw">INSERT INTO</span> aporte (id_meta, id_cuenta, fecha, valor, tipo) <span class="kw">VALUES</span>
+  (1, 4, <span class="st">&#x27;2026-08-30&#x27;</span>, 500000, <span class="st">&#x27;aporte&#x27;</span>),
+  (1, 4, <span class="st">&#x27;2026-09-30&#x27;</span>, 500000, <span class="st">&#x27;aporte&#x27;</span>),
+  (1, 4, <span class="st">&#x27;2026-10-15&#x27;</span>, 150000, <span class="st">&#x27;retiro&#x27;</span>),
+  (1, 4, <span class="st">&#x27;2026-10-30&#x27;</span>, 400000, <span class="st">&#x27;aporte&#x27;</span>),
+  (2, 1, <span class="st">&#x27;2026-10-31&#x27;</span>, 300000, <span class="st">&#x27;aporte&#x27;</span>),
+  (3, 6, <span class="st">&#x27;2026-09-15&#x27;</span>, 3500000, <span class="st">&#x27;aporte&#x27;</span>);</code></pre></div>
+
+  </section>
+
+  <section class="slide" data-id="pruebas" data-section="El script">
+    <p class="eyebrow">El script</p>
+    <h2>Pruebas de las restricciones</h2>
+    
+    <p>Cada sentencia incumple una restricción o muestra el efecto de una acción ON DELETE. El comentario de cada una indica la respuesta que se obtuvo al ejecutarla en MySQL.</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code3">Copiar</button><pre class="code" id="code3" style="max-height:34rem"><code><span class="cm">-- ============================================================</span>
+<span class="cm">-- Mi plata en orden · Pruebas de las restricciones</span>
+<span class="cm">-- Cada sentencia se ejecuta por separado sobre la base de datos poblada.</span>
+<span class="cm">-- Las que violan una restricción deben ser rechazadas por MySQL.</span>
+<span class="cm">-- ============================================================</span>
+
+<span class="kw">USE</span> mi_plata_en_orden;
+<span class="kw">SET</span> NAMES utf8mb4;
+
+<span class="cm">-- RN_009: un movimiento con valor cero</span>
+<span class="cm">-- Resultado esperado: ERROR 3819, Check constraint &#x27;ck_movimiento_valor&#x27; is violated</span>
+<span class="kw">INSERT INTO</span> movimiento (id_cuenta, id_categoria, fecha_ocurrencia, valor, descripcion)
+<span class="kw">VALUES</span> (1, 5, <span class="st">&#x27;2026-11-05&#x27;</span>, 0, <span class="st">&#x27;Mercado&#x27;</span>);
+
+<span class="cm">-- RN_001: una persona con un correo que ya existe</span>
+<span class="cm">-- Resultado esperado: ERROR 1062, Duplicate entry &#x27;sofia.r@correo.com&#x27; for key &#x27;persona.uq_persona_correo&#x27;</span>
+<span class="kw">INSERT INTO</span> persona (id_ciudad, nombres, apellidos, correo)
+<span class="kw">VALUES</span> (1, <span class="st">&#x27;Sofía&#x27;</span>, <span class="st">&#x27;Ramírez&#x27;</span>, <span class="st">&#x27;sofia.r@correo.com&#x27;</span>);
+
+<span class="cm">-- RN_007: un día de corte por fuera del rango 1 a 31</span>
+<span class="cm">-- Resultado esperado: ERROR 3819, Check constraint &#x27;ck_cuenta_dia_corte&#x27; is violated</span>
+<span class="kw">UPDATE</span> cuenta <span class="kw">SET</span> dia_corte = 35 <span class="kw">WHERE</span> id_cuenta = 3;
+
+<span class="cm">-- Integridad referencial: una cuenta de una persona que no existe</span>
+<span class="cm">-- Resultado esperado: ERROR 1452, Cannot add or update a child row: a foreign key constraint fails</span>
+<span class="kw">INSERT INTO</span> cuenta (id_persona, id_tipo_cuenta, codigo_moneda, nombre, fecha_saldo_inicial)
+<span class="kw">VALUES</span> (9, 1, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Cuenta nueva&#x27;</span>, <span class="st">&#x27;2026-11-01&#x27;</span>);
+
+<span class="cm">-- ON DELETE RESTRICT: eliminar una categoría que tiene movimientos</span>
+<span class="cm">-- Resultado esperado: ERROR 1451, Cannot delete or update a parent row: a foreign key constraint fails</span>
+<span class="kw">DELETE FROM</span> categoria <span class="kw">WHERE</span> id_categoria = 5;
+
+<span class="cm">-- RN_011: un traslado con la misma cuenta de origen y de destino</span>
+<span class="cm">-- Resultado esperado: ERROR 3819, Check constraint &#x27;ck_traslado_cuentas&#x27; is violated</span>
+<span class="kw">INSERT INTO</span> traslado (id_cuenta_origen, id_cuenta_destino, fecha, valor_sale, valor_llega)
+<span class="kw">VALUES</span> (1, 1, <span class="st">&#x27;2026-11-12&#x27;</span>, 100000, 100000);
+
+<span class="cm">-- ON DELETE CASCADE: al eliminar la compra de la nevera se eliminan sus cuotas</span>
+<span class="cm">-- Resultado esperado: la consulta devuelve 0 cuotas</span>
+<span class="kw">DELETE FROM</span> movimiento <span class="kw">WHERE</span> id_movimiento = 9;
+<span class="kw">SELECT</span> <span class="kw">COUNT</span>(*) <span class="kw">AS</span> cuotas_de_la_nevera <span class="kw">FROM</span> cuota <span class="kw">WHERE</span> id_movimiento = 9;
+
+<span class="cm">-- ON DELETE SET NULL: al eliminar un tercero, sus movimientos se conservan sin tercero</span>
+<span class="cm">-- Resultado esperado: los movimientos 5 y 12 quedan con id_tercero en NULL</span>
+<span class="kw">DELETE FROM</span> tercero <span class="kw">WHERE</span> id_tercero = 1;
+<span class="kw">SELECT</span> id_movimiento, descripcion, id_tercero <span class="kw">FROM</span> movimiento <span class="kw">WHERE</span> id_movimiento <span class="kw">IN</span> (5, 12);
+
+<span class="cm">-- UPDATE sin WHERE: intenta cambiar el correo de todas las personas</span>
+<span class="cm">-- Resultado esperado: ERROR 1062; la restricción UNIQUE del correo evita el daño.</span>
+<span class="cm">-- Sin esa restricción, todas las personas habrían quedado con el mismo correo.</span>
+<span class="kw">UPDATE</span> persona <span class="kw">SET</span> correo = <span class="st">&#x27;nuevo@correo.com&#x27;</span>;</code></pre></div>
+
+  </section>
+
+  <section class="slide" data-id="manipulacion" data-section="El script">
+    <p class="eyebrow">El script</p>
+    <h2>UPDATE, DELETE y SELECT</h2>
+    
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code4">Copiar</button><pre class="code" id="code4" style="max-height:26rem"><code><span class="cm">-- ============================================================</span>
+<span class="cm">-- Mi plata en orden · UPDATE, DELETE y SELECT</span>
+<span class="cm">-- ============================================================</span>
+
+<span class="kw">USE</span> mi_plata_en_orden;
+<span class="kw">SET</span> NAMES utf8mb4;
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- UPDATE: actualizar registros</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- Sofía cambia su correo</span>
+<span class="kw">UPDATE</span> persona
+<span class="kw">SET</span> correo = <span class="st">&#x27;sofia.ramirez@correo.com&#x27;</span>
+<span class="kw">WHERE</span> id_persona = 1;
+
+<span class="cm">-- El banco aumenta el cupo de la tarjeta del supermercado</span>
+<span class="kw">UPDATE</span> cuenta
+<span class="kw">SET</span> cupo = 6000000
+<span class="kw">WHERE</span> id_cuenta = 3;
+
+<span class="cm">-- Sofía paga la segunda cuota de la nevera</span>
+<span class="kw">UPDATE</span> cuota
+<span class="kw">SET</span> estado = <span class="st">&#x27;pagada&#x27;</span>
+<span class="kw">WHERE</span> id_movimiento = 9 <span class="kw">AND</span> numero = 2;
+
+<span class="cm">-- Sofía cierra la billetera digital</span>
+<span class="kw">UPDATE</span> cuenta
+<span class="kw">SET</span> estado = <span class="st">&#x27;cerrada&#x27;</span>
+<span class="kw">WHERE</span> id_cuenta = 5;
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- DELETE: eliminar registros</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- Se retira la etiqueta familia del movimiento del hotel</span>
+<span class="kw">DELETE FROM</span> movimiento_etiqueta
+<span class="kw">WHERE</span> id_movimiento = 8 <span class="kw">AND</span> id_etiqueta = 3;
+
+<span class="cm">-- Se elimina el pago fijo del gimnasio, que está inactivo y no tiene movimientos</span>
+<span class="kw">DELETE FROM</span> pago_fijo
+<span class="kw">WHERE</span> id_pago_fijo = 4;
+
+<span class="cm">-- ------------------------------------------------------------</span>
+<span class="cm">-- SELECT: consultar</span>
+<span class="cm">-- ------------------------------------------------------------</span>
+
+<span class="cm">-- Todas las columnas y todos los registros de la tabla persona</span>
+<span class="kw">SELECT</span> *
+<span class="kw">FROM</span> persona;
+
+<span class="cm">-- Cuentas activas de Sofía</span>
+<span class="kw">SELECT</span> nombre, saldo_inicial, estado
+<span class="kw">FROM</span> cuenta
+<span class="kw">WHERE</span> id_persona = 1 <span class="kw">AND</span> estado = <span class="st">&#x27;activa&#x27;</span>;
+
+<span class="cm">-- Movimientos de la cuenta Ahorros de la casa</span>
+<span class="kw">SELECT</span> fecha_ocurrencia, descripcion, valor
+<span class="kw">FROM</span> movimiento
+<span class="kw">WHERE</span> id_cuenta = 1;
+
+<span class="cm">-- Categorías de gasto del sistema</span>
+<span class="kw">SELECT</span> nombre
+<span class="kw">FROM</span> categoria
+<span class="kw">WHERE</span> naturaleza = <span class="st">&#x27;gasto&#x27;</span> <span class="kw">AND</span> id_persona <span class="kw">IS</span> <span class="kw">NULL</span>;
+
+<span class="cm">-- Movimientos de más de 500.000 pesos</span>
+<span class="kw">SELECT</span> id_movimiento, descripcion, valor
+<span class="kw">FROM</span> movimiento
+<span class="kw">WHERE</span> valor &gt; 500000;
+
+<span class="cm">-- Cuotas pendientes</span>
+<span class="kw">SELECT</span> id_movimiento, numero, mes, capital, intereses_proyectados
+<span class="kw">FROM</span> cuota
+<span class="kw">WHERE</span> estado = <span class="st">&#x27;pendiente&#x27;</span>;</code></pre></div>
+    <p>Algunos resultados, después de ejecutar los UPDATE y los DELETE del script. La billetera ya no aparece entre las cuentas activas porque se cerró, y de la nevera queda pendiente solo la tercera cuota:</p>
+    <h3>Cuentas activas de Sofía</h3><div class="table-wrap"><table class="datos resultado"><thead><tr><th>nombre</th><th>saldo_inicial</th><th>estado</th></tr></thead><tbody><tr><td>Ahorro para el viaje</td><td>0.00</td><td>activa</td></tr><tr><td>Ahorros de la casa</td><td>2500000.00</td><td>activa</td></tr><tr><td>Efectivo</td><td>150000.00</td><td>activa</td></tr><tr><td>Tarjeta del supermercado</td><td>0.00</td><td>activa</td></tr></tbody></table></div><h3>Categorías de gasto del sistema</h3><div class="table-wrap"><table class="datos resultado"><thead><tr><th>nombre</th></tr></thead><tbody><tr><td>Vivienda</td></tr><tr><td>Alimentación</td></tr><tr><td>Mercado</td></tr><tr><td>Restaurantes</td></tr><tr><td>Cafetería</td></tr><tr><td>Transporte</td></tr><tr><td>Servicios públicos</td></tr><tr><td>Entretenimiento</td></tr><tr><td>Hogar</td></tr></tbody></table></div><h3>Cuotas pendientes</h3><div class="table-wrap"><table class="datos resultado"><thead><tr><th>id_movimiento</th><th>numero</th><th>mes</th><th>capital</th><th>intereses_proyectados</th></tr></thead><tbody><tr><td>9</td><td>3</td><td>2027-01-01</td><td>600000.00</td><td>12660.00</td></tr></tbody></table></div>
+
+  </section>
+
+  <section class="slide" data-id="cierre" data-section="Cierre">
+    <p class="eyebrow">Cierre</p>
+    <h2>Para continuar</h2>
+    
+    <p>Al comparar su script con el de Julián, les propongo revisar tres cosas: si su script se ejecuta completo sin errores, si cada regla de negocio que se puede verificar en los datos quedó como restricción y si las acciones ON DELETE que eligieron tienen sentido para el negocio de Catalina.</p>
+    <p>En la tercera entrega van a construir este mismo script para su plataforma de eventos y networking, con las consultas que definieron en la primera entrega.</p>
+    <p>Quedo atenta a sus preguntas.</p>
+    <div class="sign"><span class="avatar">DA</span><div><small>Saludos,</small><b>Diana Angélica</b></div></div>
+
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Navegación de la solución">
+  <div class="controls-inner">
+    <button type="button" id="prev">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" class="primary" id="next">Siguiente</button>
+  </div>
+</nav>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var bar = document.getElementById('bar');
+  var dots = document.getElementById('dots');
+  var sectionName = document.getElementById('sectionName');
+  var current = 0;
+  var KEY = 'solucion-fisico-diapositiva';
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+  slides.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', s.querySelector('h1,h2').textContent);
+    b.addEventListener('click', function(){ go(i, true); });
+    dots.appendChild(b);
+  });
+  function go(i, focus){
+    if (i < 0 || i >= slides.length) return;
+    current = i;
+    slides.forEach(function(s, j){ s.hidden = j !== i; });
+    Array.prototype.forEach.call(dots.children, function(d, j){
+      d.classList.toggle('on', j === i);
+      d.classList.toggle('done', j < i);
+      if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    sectionName.textContent = slides[i].getAttribute('data-section');
+    var id = slides[i].getAttribute('data-id');
+    if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch(e){ location.hash = id; } }
+    store.set(KEY, id);
+    window.scrollTo(0, 0);
+    if (focus) { var h = slides[i].querySelector('h1,h2'); h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  }
+  function indexOf(id){
+    for (var i = 0; i < slides.length; i++) if (slides[i].getAttribute('data-id') === id) return i;
+    return -1;
+  }
+  prev.addEventListener('click', function(){ go(current - 1, true); });
+  next.addEventListener('click', function(){ go(current + 1, true); });
+  document.addEventListener('keydown', function(e){
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+    if (e.key === 'ArrowRight') go(current + 1, true);
+    if (e.key === 'ArrowLeft') go(current - 1, true);
+  });
+  window.addEventListener('hashchange', function(){
+    var i = indexOf(location.hash.slice(1));
+    if (i >= 0 && i !== current) go(i, false);
+  });
+  var start = indexOf(location.hash.slice(1));
+  if (start < 0) start = indexOf(store.get(KEY) || '');
+  go(start < 0 ? 0 : start, false);
+
+  var status = document.getElementById('copyStatus');
+  var tpl = document.getElementById('plantilla');
+  var copyBtn = document.getElementById('copyTemplate');
+  if (copyBtn) copyBtn.addEventListener('click', function(){
+    var html = tpl.innerHTML, text = tpl.innerText;
+    function done(){ status.textContent = 'Formato copiado. Péguenlo en su documento.'; }
+    function fallback(){
+      var r = document.createRange(); r.selectNodeContents(tpl);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = false; try { ok = document.execCommand('copy'); } catch(e){}
+      if (ok) { sel.removeAllRanges(); done(); }
+      else { status.textContent = 'El formato quedó seleccionado; cópienlo con Ctrl+C o Cmd+C.'; }
+    }
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        var item = new ClipboardItem({
+          'text/html': new Blob([html], {type:'text/html'}),
+          'text/plain': new Blob([text], {type:'text/plain'})
+        });
+        navigator.clipboard.write([item]).then(done, fallback);
+      } else { fallback(); }
+    } catch(e){ fallback(); }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  document.querySelectorAll('.copy[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = document.getElementById(b.getAttribute('data-copy')).innerText;
+      function ok(){ var o = b.textContent; b.textContent = 'Copiado'; setTimeout(function(){ b.textContent = o; }, 1500); }
+      try {
+        if (navigator.clipboard) { navigator.clipboard.writeText(t).then(ok, function(){ sel(); }); } else { sel(); }
+      } catch(e){ sel(); }
+      function sel(){ var r = document.createRange(); r.selectNodeContents(document.getElementById(b.getAttribute('data-copy'))); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Seleccionado: Ctrl+C'; }
+    });
+  });
+})();
+</script>
+</body>
+</html>

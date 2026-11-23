@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Del modelo lógico al físico</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap">
+<style>
+/* Diapositivas de sesión con la misma identidad del taller: tarjeta amplia por paso, barra de avance y navegación fija. */
+:root{
+  --bg:#eef2f6;
+  --surface:#ffffff;
+  --surface-2:#f4f7fa;
+  --ink:#24303d;
+  --muted:#5b6878;
+  --line:#c9d7e4;
+  --accent:#236fa1;
+  --accent-ink:#ffffff;
+  --accent-soft:#e3eef7;
+  --slate:#475577;
+  --ok:#24804f;
+  --ok-soft:#e5f3ea;
+  --warn:#a3501c;
+  --warn-soft:#f8ece3;
+  --font-display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body:"Source Sans 3", "Segoe UI", Arial, sans-serif;
+  --step--1:0.9rem;
+  --step-0:1.06rem;
+  --step-1:1.25rem;
+  --step-2:1.6rem;
+  --step-3:2.15rem;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+    --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+    --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#121a23; --surface:#1a2430; --surface-2:#212d3b; --ink:#e3e9f0; --muted:#a3b0bf;
+  --line:#33475c; --accent:#6aaee0; --accent-ink:#0c1620; --accent-soft:#1d3347; --slate:#b4c0d9;
+  --ok:#6cc595; --ok-soft:#173326; --warn:#e6a073; --warn-soft:#3a2518; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:var(--step-0); line-height:1.65;
+  display:flex; flex-direction:column;
+}
+.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:5; background:var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:12px 8px;
+}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:var(--bg)}
+.top-inner{max-width:62rem; margin:0 auto; display:flex; flex-direction:column; gap:8px}
+.top-row{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap}
+.course{font-size:var(--step--1); color:var(--muted); letter-spacing:.06em; text-transform:uppercase; font-weight:600}
+.section-name{font-size:var(--step--1); color:var(--accent); font-weight:700}
+.bar{height:6px; background:var(--line); border-radius:99px; overflow:hidden}
+.bar span{display:block; height:100%; width:0; background:var(--accent); transition:width .3s ease}
+main{
+  flex:1; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:8px 24px;
+}
+.slide{
+  max-width:62rem; margin:0 auto; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+  padding:clamp(22px,4vw,44px); display:flex; flex-direction:column; gap:16px;
+}
+.slide[hidden]{display:none!important}
+.eyebrow{font-size:var(--step--1); letter-spacing:.08em; text-transform:uppercase; color:var(--slate); font-weight:700; margin:0}
+h1,h2,h3{font-family:var(--font-display); color:var(--ink); text-wrap:balance; margin:0; line-height:1.2}
+h1{font-size:var(--step-3); color:var(--accent)}
+h2{font-size:var(--step-2)}
+h3{font-size:var(--step-1); color:var(--slate)}
+p{margin:0; max-width:68ch}
+.lead{font-size:var(--step-1); color:var(--muted); max-width:52ch}
+ul{margin:0; padding-left:1.3em; display:flex; flex-direction:column; gap:8px; max-width:68ch}
+strong{color:var(--ink)}
+.cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:16px}
+.cols > *{min-width:0}
+.panel{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px}
+.cols.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:900px){ .cols.four{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:520px){ .cols.four{grid-template-columns:1fr} }
+.iana{display:grid; grid-template-columns:minmax(0,14rem) 1fr; gap:22px; align-items:center}
+.iana img{width:100%; border-radius:14px; border:1px solid var(--line); display:block}
+.iana-text{display:flex; flex-direction:column; gap:12px; min-width:0}
+@media (max-width:620px){ .iana{grid-template-columns:1fr} .iana img{max-width:14rem} }
+.panel h3{font-size:var(--step-0); font-family:var(--font-body); font-weight:700; color:var(--accent)}
+.formula{
+  font-family:var(--font-display); font-size:var(--step-1); background:var(--accent-soft); border-left:4px solid var(--accent);
+  padding:14px 18px; border-radius:6px; max-width:52ch;
+}
+.formula em{color:var(--accent); font-style:normal; font-weight:700}
+.compare{display:grid; grid-template-columns:repeat(auto-fit,minmax(15rem,1fr)); gap:14px}
+.compare > div{border-radius:10px; padding:14px 16px; display:flex; flex-direction:column; gap:6px; min-width:0}
+.yes{background:var(--ok-soft); border:1px solid var(--ok)}
+.no{background:var(--warn-soft); border:1px solid var(--warn)}
+.tag{font-size:var(--step--1); font-weight:700; letter-spacing:.04em; text-transform:uppercase}
+.yes .tag{color:var(--ok)} .no .tag{color:var(--warn)}
+.table-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:8px}
+table{border-collapse:collapse; width:100%; min-width:34rem; font-size:var(--step--1)}
+th{background:var(--slate); color:var(--surface); text-align:left; padding:8px 12px; font-weight:600}
+td{padding:9px 12px; border-top:1px solid var(--line); vertical-align:top}
+.story{border:1px solid var(--line); border-radius:10px; overflow:hidden}
+.story div{display:grid; grid-template-columns:9.5rem 1fr; border-top:1px solid var(--line)}
+.story div:first-child{border-top:0}
+.story b{background:var(--surface-2); color:var(--slate); padding:9px 12px; font-size:var(--step--1)}
+.story span{padding:9px 12px; font-size:var(--step--1); min-width:0}
+@media (max-width:520px){ .story div{grid-template-columns:1fr} }
+.flow{display:flex; flex-direction:row; flex-wrap:wrap; gap:10px; align-items:stretch; list-style:none; padding:0; max-width:none}
+.flow li{flex:1 1 7rem; border:1px solid var(--line); border-radius:10px; padding:12px 14px; background:var(--surface-2); display:flex; flex-direction:column; gap:4px; position:relative}
+.flow li:not(:last-child)::after{content:"\2192"; position:absolute; right:-10px; top:50%; transform:translate(50%,-50%); color:var(--muted); font-weight:700; z-index:1}
+@media (max-width:640px){ .flow{flex-direction:column} .flow li{flex:none} .flow li:not(:last-child)::after{content:"\2193"; right:50%; top:auto; bottom:-10px; transform:translate(50%,50%)} }
+.flow li.here{border-color:var(--accent); background:var(--accent-soft)}
+.flow li small{color:var(--muted); line-height:1.4}
+.flow li b{font-family:var(--font-display); font-size:var(--step-0)}
+.flow .chip{align-self:flex-start; font-size:.75rem; font-weight:700; color:var(--accent-ink); background:var(--accent); padding:1px 8px; border-radius:99px; letter-spacing:.03em}
+.diagram{background:var(--surface-2); border:1px solid var(--line); border-radius:10px; padding:16px; overflow-x:auto}
+.diagram svg{display:block; min-width:30rem; width:100%; max-width:40rem; height:auto; margin:0 auto}
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; font-size:var(--step--1); color:var(--muted)}
+.people{display:grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:16px}
+.person{border:1px solid var(--line); border-radius:12px; padding:18px; display:flex; gap:14px; align-items:flex-start; background:var(--surface-2)}
+.person > div{min-width:0; display:flex; flex-direction:column; gap:4px}
+.avatar{flex:none; width:52px; height:52px; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:1.2rem; background:var(--accent); color:var(--accent-ink)}
+.avatar.alt{background:var(--slate); color:var(--surface)}
+.note{background:var(--accent-soft); border-radius:10px; padding:14px 18px; max-width:68ch}
+.player{border:1px solid var(--accent); border-radius:12px; padding:16px 18px; display:flex; flex-direction:column; gap:10px; background:var(--accent-soft)}
+.player h3{font-family:var(--font-body); font-size:var(--step-0); color:var(--accent)}
+.player audio{width:100%}
+.player .missing{font-size:var(--step--1); color:var(--muted)}
+.scenes{display:flex; flex-wrap:wrap; gap:8px; list-style:none; padding:0; max-width:none}
+.scenes li{border:1px solid var(--line); border-radius:99px; padding:4px 12px; font-size:var(--step--1); background:var(--surface)}
+.checks{list-style:none; padding:0}
+.checks li{display:flex; gap:10px}
+.checks li::before{content:""; flex:none; width:1.05em; height:1.05em; margin-top:.3em; border:2px solid var(--accent); border-radius:4px}
+button:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.template{border:1px solid var(--line); border-radius:10px; background:#ffffff; color:#24303d; padding:18px 20px; max-height:24rem; overflow:auto; font-size:var(--step--1)}
+.template p{margin:0 0 8px}
+.template table{min-width:0; font-size:inherit}
+.template th{color:#24303d}
+.tracks{gap:6px}
+.track{display:grid; grid-template-columns:minmax(0,15rem) 1fr; gap:4px 14px; align-items:center; padding:6px 0; border-top:1px solid var(--line)}
+.track:first-child{border-top:0}
+.track span{font-weight:600; font-size:var(--step--1); color:var(--ink)}
+.track audio{width:100%; min-width:0}
+.track .missing{grid-column:2}
+@media (max-width:560px){ .track{grid-template-columns:1fr} .track .missing{grid-column:1} }
+.actions{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.status{font-size:var(--step--1); color:var(--ok)}
+.sign{display:flex; align-items:center; gap:12px; margin-top:6px}
+.sign .avatar{width:44px; height:44px; font-size:1rem}
+.sign small{display:block; color:var(--muted)}
+.sign b{color:var(--slate)}
+nav.controls{
+  position:sticky; bottom:0; z-index:5; background:var(--bg); border-top:1px solid var(--line);
+  padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:10px calc(10px + env(safe-area-inset-bottom,0px));
+}
+.controls-inner{max-width:62rem; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:12px}
+button{
+  font:inherit; font-weight:700; border-radius:10px; padding:10px 18px; cursor:pointer; border:2px solid var(--accent);
+  background:var(--surface); color:var(--accent);
+}
+a.button{display:inline-block; text-decoration:none; font-weight:700; border-radius:10px; padding:10px 18px; border:2px solid var(--accent)}
+a.button.primary, button.primary{background:var(--accent); color:var(--accent-ink)}
+button:disabled{opacity:.4; cursor:default}
+.dots{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; flex:1; min-width:0}
+.dots button{width:12px; height:12px; padding:0; border-radius:50%; border:2px solid var(--line); background:var(--surface)}
+.dots button.on{background:var(--accent); border-color:var(--accent)}
+.dots button.done{border-color:var(--accent)}
+@media (max-width:560px){ .dots{display:none} button{padding:10px 14px} }
+@media (prefers-reduced-motion:reduce){ .bar span{transition:none} }
+
+.cols.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px){ .cols.three{grid-template-columns:1fr} }
+.datos td.hl{background:var(--warn-soft); color:var(--warn); font-weight:600}
+.datos{min-width:30rem}
+.datos td{white-space:nowrap}
+.narrow{max-width:24rem}
+.narrow table{min-width:0}
+.diagram.mid svg{max-width:52rem; min-width:40rem}
+.diagram.wide svg{max-width:none; min-width:46rem}
+.diagram.small svg{max-width:17rem; min-width:14rem}
+a.button{color:var(--accent); background:var(--surface)}
+a.button.primary{color:var(--accent-ink); background:var(--accent)}
+.template th{background:#e3eef7; color:#24303d}
+
+.slide p, .slide li, .slide td{overflow-wrap:anywhere}
+.slide li{min-width:0}
+.code-wrap{position:relative; margin:0.4rem 0 1rem}
+pre.code{background:#f5f8fb; border:1px solid #d5dee8; border-radius:10px; padding:0.9rem 1rem; overflow:auto; font-family:ui-monospace, "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size:0.86rem; line-height:1.5; color:#24303d; margin:0; white-space:pre}
+pre.code .kw{color:#1d5f8f; font-weight:700}
+pre.code .ty{color:#7a4fa0}
+pre.code .st{color:#9a4d16}
+pre.code .cm{color:#6b7787; font-style:italic}
+.code-wrap .copy{position:absolute; top:6px; right:6px; font-size:0.75rem; padding:4px 10px; min-height:0}
+.sqlerror{background:var(--warn-soft); color:var(--warn); border-radius:8px; padding:0.6rem 0.9rem; font-family:ui-monospace, Consolas, monospace; font-size:0.82rem; margin:0.3rem 0 1rem; overflow-wrap:anywhere}
+.sqlerror strong{font-family:inherit}
+table.resultado td{white-space:nowrap}
+.mapa{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0.8rem; margin:0.8rem 0 1rem}
+.mapa .grupo{border:1.5px solid #b8cfe0; border-radius:12px; padding:0.8rem; background:var(--surface)}
+.mapa .grupo b{display:block; color:var(--accent); margin-bottom:0.2rem}
+.mapa .grupo small{display:block; color:var(--muted); margin-bottom:0.5rem}
+.mapa .chip{display:inline-block; border-radius:999px; padding:2px 10px; margin:2px 4px 2px 0; background:#e3eef7; color:#1d5f8f; font-family:ui-monospace, Consolas, monospace; font-size:0.8rem; font-weight:700}
+.mapa .chip.on{background:#f2b632; color:#3a2a00}
+.mapa .grupo.on{border-color:var(--accent); box-shadow:0 0 0 2px rgba(35,111,161,.15)}
+@media (max-width:760px){ .mapa{grid-template-columns:1fr} }
+.cols.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:760px){ .cols.two{grid-template-columns:1fr} }
+.figura img{width:100%; height:auto; border:1px solid #d5dee8; border-radius:10px; background:#fff}
+table.reglas{min-width:38rem}
+table.reglas td:first-child{white-space:nowrap}
+</style>
+
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="top-row">
+      <span class="course">Bases de Datos · Sesión</span>
+      <span class="section-name" id="sectionName">Bienvenida</span>
+    </div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+  </div>
+</header>
+
+<main id="slides">
+
+  <section class="slide" data-id="bienvenida" data-section="Bienvenida">
+    <p class="eyebrow">Sesión</p>
+    <h1>Del modelo lógico al modelo físico</h1>
+    
+    <p class="lead">El script de la base de datos de Mi plata en orden.</p>
+    <p>Apreciados estudiantes:</p>
+    <p>En las sesiones anteriores acompañamos a Catalina y a Julián desde la conversación hasta el modelo lógico normalizado de la plataforma. En esta sesión damos el último paso del diseño: transformar ese modelo lógico en el modelo físico, es decir, en las tablas de una base de datos real, y empezar a trabajar con sus datos.</p>
+    <p>Primero vemos qué es SQL y cómo se organizan sus sentencias. Después transformamos el modelo lógico en tablas, con sus llaves y sus restricciones, y practicamos las sentencias para agregar, actualizar, eliminar y consultar datos. Es lo que van a construir para su proyecto en la tercera entrega.</p>
+    <div class="note">Los ejemplos están escritos para MySQL 8.0.16 o una versión posterior, y se ejecutaron sobre la base de datos de Mi plata en orden. Las respuestas de MySQL que aparecen en las diapositivas son las que se obtuvieron al ejecutarlos.</div>
+
+  </section>
+
+  <section class="slide" data-id="camino" data-section="El camino">
+    <p class="eyebrow">El camino</p>
+    <h2>El modelo físico en el camino del diseño</h2>
+    
+    <p>El modelo físico es el último de los modelos del proceso de abstracción. Se obtiene por transformación del modelo lógico y corresponde con el esquema de la base de datos en un sistema gestor de bases de datos (SGBD) concreto, en nuestro caso MySQL.</p>
+    <ul class="flow">
+      <li><b>Realidad</b><small>El negocio tal como lo explicó Catalina.</small></li>
+      <li><b>Modelo conceptual</b><small>Conceptos, características y relaciones.</small></li>
+      <li><b>Modelo lógico</b><small>Entidades, atributos y llaves, en tercera forma normal.</small></li>
+      <li class="here"><b>Modelo físico</b><small>Tablas, columnas, tipos de datos y restricciones en el SGBD.</small></li>
+    </ul>
+    <p>Desde aquí hablamos de <strong>tablas</strong> y <strong>columnas</strong>. Cada tabla se crea con una sentencia del lenguaje SQL, y el conjunto de esas sentencias forma el <strong>script</strong> de creación de la base de datos: un archivo que se puede guardar, revisar y volver a ejecutar para construir la base de datos completa.</p>
+
+  </section>
+
+  <section class="slide" data-id="sql" data-section="El lenguaje SQL">
+    <p class="eyebrow">El lenguaje SQL</p>
+    <h2>El lenguaje SQL y sus grupos de sentencias</h2>
+    
+    <p>SQL (Structured Query Language) es el lenguaje estándar para trabajar con bases de datos relacionales. Sus sentencias se organizan en tres grupos, según lo que hacen:</p>
+    <div class="mapa"><div class="grupo"><b>DDL · Definición de datos</b><small>Crea y modifica la estructura.</small><span class="chip">CREATE</span><span class="chip">ALTER</span><span class="chip">DROP</span></div><div class="grupo"><b>DML · Manipulación de datos</b><small>Agrega, cambia, elimina y consulta los datos.</small><span class="chip">INSERT</span><span class="chip">UPDATE</span><span class="chip">DELETE</span><span class="chip">SELECT</span></div><div class="grupo"><b>DCL · Control de acceso</b><small>Otorga y retira permisos.</small><span class="chip">GRANT</span><span class="chip">REVOKE</span></div></div>
+    <p>Con las sentencias de <strong>definición de datos</strong> se construye y se modifica la estructura: crear una tabla, agregarle una columna o eliminarla. Con las de <strong>manipulación de datos</strong> se trabaja con la información guardada en esa estructura: agregar registros, actualizarlos, eliminarlos y consultarlos. Las de <strong>control de acceso</strong> definen qué puede hacer cada usuario de la base de datos.</p>
+    <p>En esta sesión trabajamos con las dos primeras. Empezamos por CREATE, que construye las tablas a partir del modelo lógico.</p>
+
+  </section>
+
+  <section class="slide" data-id="transformaciones" data-section="Las transformaciones">
+    <p class="eyebrow">Las transformaciones</p>
+    <h2>Del modelo lógico al modelo físico</h2>
+    
+    <div class="mapa"><div class="grupo on"><b>DDL · Definición de datos</b><small>Crea y modifica la estructura.</small><span class="chip on">CREATE</span><span class="chip">ALTER</span><span class="chip">DROP</span></div><div class="grupo"><b>DML · Manipulación de datos</b><small>Agrega, cambia, elimina y consulta los datos.</small><span class="chip">INSERT</span><span class="chip">UPDATE</span><span class="chip">DELETE</span><span class="chip">SELECT</span></div><div class="grupo"><b>DCL · Control de acceso</b><small>Otorga y retira permisos.</small><span class="chip">GRANT</span><span class="chip">REVOKE</span></div></div>
+    <p>Para obtener el modelo físico, cada elemento del modelo lógico se transforma así:</p>
+    <ul class="flow">
+      <li><b>Entidades a tablas</b><small>Cada entidad pasa a ser una tabla con el mismo nombre.</small></li>
+      <li><b>Atributos a columnas</b><small>Cada atributo pasa a ser una columna con su tipo de dato, y se define si admite valores vacíos (NULL) o no (NOT NULL). La llave primaria se declara con PRIMARY KEY.</small></li>
+      <li><b>Relaciones a llaves foráneas</b><small>Cada llave foránea se declara con FOREIGN KEY y la tabla a la que hace referencia.</small></li>
+      <li><b>Restricciones</b><small>Las reglas de negocio que se pueden verificar en los datos se declaran con NOT NULL, UNIQUE y CHECK.</small></li>
+    </ul>
+    <p>Vamos a recorrer cada transformación con las tablas de Mi plata en orden.</p>
+
+  </section>
+
+  <section class="slide" data-id="tipos" data-section="Las transformaciones">
+    <p class="eyebrow">Las transformaciones</p>
+    <h2>Los tipos de datos</h2>
+    
+    <p>Cada columna tiene un tipo de dato, que define qué valores puede guardar y cuánto espacio ocupa. Estos son los tipos que usamos en Mi plata en orden:</p>
+    <div class="table-wrap"><table class="reglas">
+      <thead><tr><th>Tipo en MySQL</th><th>Qué guarda</th><th>Ejemplo del caso</th></tr></thead>
+      <tbody>
+        <tr><td><code>INT UNSIGNED</code></td><td>Números enteros sin signo. Con <code>AUTO_INCREMENT</code>, MySQL asigna el siguiente número a cada registro nuevo.</td><td><em>id_persona</em>, <em>id_cuenta</em></td></tr>
+        <tr><td><code>TINYINT UNSIGNED</code></td><td>Enteros pequeños, de 0 a 255.</td><td><em>dia_corte</em>, <em>numero_cuotas</em></td></tr>
+        <tr><td><code>DECIMAL(14,2)</code></td><td>Números exactos con decimales: 14 dígitos en total, 2 de ellos decimales. Es el tipo indicado para el dinero, porque guarda el valor sin redondeos.</td><td><em>valor</em>, <em>saldo_inicial</em>, <em>cupo</em></td></tr>
+        <tr><td><code>VARCHAR(n)</code></td><td>Textos de longitud variable, hasta n caracteres.</td><td><em>nombres</em>, <em>correo</em>, <em>descripcion</em></td></tr>
+        <tr><td><code>CHAR(n)</code></td><td>Textos de longitud fija.</td><td><em>codigo_moneda</em> (COP), <em>ultimos_cuatro</em></td></tr>
+        <tr><td><code>DATE</code></td><td>Fechas, en el formato 'AAAA-MM-DD'.</td><td><em>fecha_ocurrencia</em>, <em>mes</em></td></tr>
+        <tr><td><code>DATETIME</code></td><td>Fecha y hora.</td><td><em>fecha_registro</em> del movimiento</td></tr>
+      </tbody>
+    </table></div>
+    <p>Elegir el tipo es parte del diseño. Los últimos cuatro números de una cuenta se guardan como texto, en <code>CHAR(4)</code>, porque forman un código que puede empezar por cero y con el que no se hacen operaciones; el valor de un movimiento se guarda en <code>DECIMAL</code>, porque con él se suma y se compara.</p>
+
+  </section>
+
+  <section class="slide" data-id="create" data-section="Las transformaciones">
+    <p class="eyebrow">Las transformaciones</p>
+    <h2>Entidades a tablas y atributos a columnas</h2>
+    
+    <p>La sentencia <code>CREATE TABLE</code> crea una tabla con sus columnas. Esta es la tabla <em>tipo_cuenta</em>, que en el modelo lógico tiene una llave primaria y dos atributos:</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code1">Copiar</button><pre class="code" id="code1"><code><span class="kw">CREATE TABLE</span> tipo_cuenta (
+  id_tipo_cuenta <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  nombre         <span class="ty">VARCHAR</span>(40)  <span class="kw">NOT NULL</span>,
+  clase          <span class="ty">VARCHAR</span>(10)  <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_tipo_cuenta)
+);</code></pre></div>
+    <p>Cada línea define una columna con su nombre, su tipo de dato y si admite valores vacíos. Al final, <code>PRIMARY KEY</code> indica cuál columna, o cuáles columnas, forman la llave primaria. Una llave primaria nunca admite valores vacíos y no repite valores, así que MySQL garantiza que cada registro se pueda identificar.</p>
+    <p>Cuando la llave primaria está formada por varias columnas, como en la cuota, se escriben todas dentro del paréntesis: <code>PRIMARY KEY (id_movimiento, numero)</code>.</p>
+
+  </section>
+
+  <section class="slide" data-id="nulos" data-section="Las transformaciones">
+    <p class="eyebrow">Las transformaciones</p>
+    <h2>NULL o NOT NULL</h2>
+    
+    <p>Para cada columna se decide si es obligatoria (<code>NOT NULL</code>) o si puede quedar vacía (<code>NULL</code>). La decisión sale de la cardinalidad mínima del modelo y de las reglas de negocio:</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code2">Copiar</button><pre class="code" id="code2"><code><span class="kw">CREATE TABLE</span> cuenta (
+  id_cuenta           <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span> <span class="kw">AUTO_INCREMENT</span>,
+  id_persona          <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,   -- RN_002: toda cuenta es de una persona
+  id_tipo_cuenta      <span class="ty">INT UNSIGNED</span>     <span class="kw">NOT NULL</span>,
+  id_entidad          <span class="ty">INT UNSIGNED</span>     <span class="kw">NULL</span>,       -- RN_004: el efectivo no tiene entidad
+  codigo_moneda       <span class="ty">CHAR</span>(3)          <span class="kw">NOT NULL</span>,   -- RN_003: toda cuenta maneja una moneda
+  nombre              <span class="ty">VARCHAR</span>(60)      <span class="kw">NOT NULL</span>,
+  ultimos_cuatro      <span class="ty">CHAR</span>(4)          <span class="kw">NULL</span>,
+  saldo_inicial       <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> 0,
+  fecha_saldo_inicial <span class="ty">DATE</span>             <span class="kw">NOT NULL</span>,
+  estado              <span class="ty">VARCHAR</span>(10)      <span class="kw">NOT NULL</span> <span class="kw">DEFAULT</span> <span class="st">&#x27;activa&#x27;</span>,
+  cupo                <span class="ty">DECIMAL</span>(14,2)    <span class="kw">NULL</span>,       -- RN_007: solo en tarjetas de crédito
+  dia_corte           <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NULL</span>,
+  dia_pago            <span class="ty">TINYINT UNSIGNED</span> <span class="kw">NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_cuenta)
+);</code></pre></div>
+    <p>La palabra <code>DEFAULT</code> define el valor que toma la columna cuando el registro se agrega sin ese dato: una cuenta nueva queda <em>activa</em> y con saldo inicial cero, salvo que se indique otra cosa. En el porcentaje de alerta del presupuesto, por ejemplo, la regla RN_013 se cumple con <code>DEFAULT 80</code>.</p>
+
+  </section>
+
+  <section class="slide" data-id="foraneas" data-section="Las llaves foráneas">
+    <p class="eyebrow">Las llaves foráneas</p>
+    <h2>Las relaciones se transforman en llaves foráneas</h2>
+    
+    <div class="diagram " role="img" aria-label="Modelo lógico: una persona posee cero o muchas cuentas, y cada cuenta pertenece a una sola persona. La cuenta guarda id_persona como llave foránea."><svg viewBox="0 0 700 218" xmlns="http://www.w3.org/2000/svg" font-family="Source Sans 3, Arial, sans-serif"><g fill="none" stroke="currentColor" stroke-width="2" style="color:var(--slate)"><polyline points="240.0,97.0 450.0,97.0" fill="none"/><line x1="254.0" y1="85.0" x2="254.0" y2="109.0"/><line x1="264.0" y1="85.0" x2="264.0" y2="109.0"/><line x1="432.0" y1="97.0" x2="450.0" y2="82.0"/><line x1="432.0" y1="97.0" x2="450.0" y2="112.0"/><circle cx="420.0" cy="97.0" r="8" fill="var(--surface)"/><rect x="20" y="20" width="220" height="160" rx="8" fill="var(--surface)"/><line x1="20" y1="54" x2="240" y2="54"/><line x1="60" y1="54" x2="60" y2="180" stroke-width="1"/><rect x="450" y="20" width="230" height="182" rx="8" fill="var(--surface)"/><line x1="450" y1="54" x2="680" y2="54"/><line x1="490" y1="54" x2="490" y2="202" stroke-width="1"/></g><g fill="var(--ink)"><text x="345" y="86" text-anchor="middle" fill="var(--muted)" font-size="15">posee</text><text x="130.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">persona</text><text x="40.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="70" y="79" font-size="15" text-decoration="underline">id_persona</text><text x="70" y="101" font-size="15">nombres</text><text x="70" y="123" font-size="15">apellidos</text><text x="70" y="145" font-size="15">correo</text><text x="70" y="167" font-size="15">…</text><text x="565.0" y="43" text-anchor="middle" font-weight="700" font-size="16" fill="var(--accent)">cuenta</text><text x="470.0" y="79" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">PK</text><text x="500" y="79" font-size="15" text-decoration="underline">id_cuenta</text><text x="470.0" y="101" text-anchor="middle" font-size="11" font-weight="700" fill="var(--muted)">FK</text><text x="500" y="101" font-size="15">id_persona</text><text x="500" y="123" font-size="15">nombre</text><text x="500" y="145" font-size="15">ultimos_cuatro</text><text x="500" y="167" font-size="15">saldo_inicial</text><text x="500" y="189" font-size="15">…</text></g></svg></div>
+    <p>La relación entre la persona y la cuenta del modelo lógico se declara en la tabla del lado muchos, la cuenta, con <code>FOREIGN KEY</code>:</p>
+    <div class="code-wrap"><pre class="code" id="code3"><code><span class="kw">CONSTRAINT</span> fk_cuenta_persona <span class="kw">FOREIGN KEY</span> (id_persona)
+  <span class="kw">REFERENCES</span> persona (id_persona)</code></pre></div>
+    <p>Con esta declaración, MySQL verifica que cada valor de <em>id_persona</em> en la cuenta exista en la tabla persona. Por eso las tablas se crean en orden: primero las que no tienen llaves foráneas, como ciudad, moneda y tipo_cuenta; después persona; después cuenta, y así sucesivamente. Si se intenta crear la cuenta antes que la persona, MySQL responde que no encuentra la tabla a la que hace referencia.</p>
+    <p>La palabra <code>CONSTRAINT</code> le da un nombre a la restricción. Es opcional, y nombrarlas con un prefijo, como <em>fk_</em> para las llaves foráneas, <em>uq_</em> para UNIQUE y <em>ck_</em> para CHECK, permite reconocer en los mensajes de error cuál regla se incumplió.</p>
+
+  </section>
+
+  <section class="slide" data-id="compuestas" data-section="Las llaves foráneas">
+    <p class="eyebrow">Las llaves foráneas</p>
+    <h2>Llaves compuestas y tablas intermedias</h2>
+    
+    <p>Las tablas intermedias que resolvieron las relaciones de muchos a muchos tienen una llave primaria formada por dos llaves foráneas. Así queda la tabla que une los movimientos con sus etiquetas:</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code4">Copiar</button><pre class="code" id="code4"><code><span class="kw">CREATE TABLE</span> movimiento_etiqueta (
+  id_movimiento <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  id_etiqueta   <span class="ty">INT UNSIGNED</span> <span class="kw">NOT NULL</span>,
+  <span class="kw">PRIMARY KEY</span> (id_movimiento, id_etiqueta),
+  <span class="kw">CONSTRAINT</span> fk_me_movimiento <span class="kw">FOREIGN KEY</span> (id_movimiento)
+    <span class="kw">REFERENCES</span> movimiento (id_movimiento),
+  <span class="kw">CONSTRAINT</span> fk_me_etiqueta <span class="kw">FOREIGN KEY</span> (id_etiqueta)
+    <span class="kw">REFERENCES</span> etiqueta (id_etiqueta)
+);</code></pre></div>
+    <p>La llave primaria compuesta garantiza que una misma etiqueta no se asigne dos veces al mismo movimiento. Las columnas de una llave foránea tienen el mismo tipo de dato que la llave primaria a la que hacen referencia; por eso <em>id_movimiento</em> es <code>INT UNSIGNED</code> en las dos tablas.</p>
+    <p>Cuando dos columnas de una tabla hacen referencia a la misma tabla, cada una lleva un nombre que explica su significado. En el traslado, <em>id_cuenta_origen</em> e <em>id_cuenta_destino</em> hacen referencia a la cuenta.</p>
+
+  </section>
+
+  <section class="slide" data-id="acciones" data-section="Las llaves foráneas">
+    <p class="eyebrow">Las llaves foráneas</p>
+    <h2>ON DELETE y ON UPDATE</h2>
+    
+    <p>Cada llave foránea define qué pasa con los registros que la usan cuando se elimina o se actualiza el registro al que hacen referencia:</p>
+    <div class="code-wrap"><pre class="code" id="code5"><code><span class="kw">CONSTRAINT</span> fk_cuota_movimiento <span class="kw">FOREIGN KEY</span> (id_movimiento)
+  <span class="kw">REFERENCES</span> movimiento (id_movimiento)
+  <span class="kw">ON DELETE</span> <span class="kw">CASCADE</span>
+  <span class="kw">ON UPDATE</span> <span class="kw">CASCADE</span></code></pre></div>
+    <div class="table-wrap"><table class="reglas">
+      <thead><tr><th>Opción</th><th>Qué hace</th><th>Dónde la usa Julián</th></tr></thead>
+      <tbody>
+        <tr><td><code>RESTRICT</code> o <code>NO ACTION</code></td><td>Impide eliminar o actualizar el registro mientras otros registros lo usen. En MySQL las dos opciones funcionan igual, y es el comportamiento por omisión.</td><td>Una categoría con movimientos no se puede eliminar; así se protege la información registrada.</td></tr>
+        <tr><td><code>CASCADE</code></td><td>Aplica la misma operación a los registros que lo usan: si se elimina el registro, también se eliminan ellos.</td><td>Las cuotas de una compra: si se elimina la compra, sus cuotas dejan de tener sentido.</td></tr>
+        <tr><td><code>SET NULL</code></td><td>Deja vacía la llave foránea de los registros que lo usan. Exige que la columna admita NULL.</td><td>El tercero de un movimiento: si se elimina el tercero, el movimiento se conserva sin él.</td></tr>
+        <tr><td><code>SET DEFAULT</code></td><td>Asigna el valor por omisión de la columna. Hace parte del estándar, y el motor InnoDB de MySQL no la admite.</td><td>No se usa.</td></tr>
+      </tbody>
+    </table></div>
+    <p>La elección depende de la relación: <code>RESTRICT</code> protege los datos, <code>CASCADE</code> sirve para los registros que dependen por completo de otro, como los conceptos débiles, y <code>SET NULL</code> sirve para las relaciones opcionales.</p>
+
+  </section>
+
+  <section class="slide" data-id="restricciones" data-section="Las restricciones">
+    <p class="eyebrow">Las restricciones</p>
+    <h2>Las reglas de negocio se convierten en restricciones</h2>
+    
+    <p>Las restricciones limitan los valores que se pueden guardar en una columna. Muchas de las reglas de negocio de la primera entrega llegan al modelo físico así:</p>
+    <div class="table-wrap"><table class="reglas">
+      <thead><tr><th>Regla de negocio</th><th>Restricción en el modelo físico</th></tr></thead>
+      <tbody>
+        <tr><td>RN_001 El correo de cada persona es único.</td><td><code>CONSTRAINT uq_persona_correo UNIQUE (correo)</code></td></tr>
+        <tr><td>RN_009 El valor de un movimiento es mayor que cero.</td><td><code>CONSTRAINT ck_movimiento_valor CHECK (valor &gt; 0)</code></td></tr>
+        <tr><td>RN_007 El día de corte está entre 1 y 31.</td><td><code>CONSTRAINT ck_cuenta_dia_corte CHECK (dia_corte BETWEEN 1 AND 31)</code></td></tr>
+        <tr><td>RN_006 El estado de una cuenta es activa o cerrada.</td><td><code>CONSTRAINT ck_cuenta_estado CHECK (estado IN ('activa', 'cerrada'))</code></td></tr>
+        <tr><td>RN_012 Cada persona tiene como máximo un presupuesto por mes.</td><td><code>CONSTRAINT uq_presupuesto_persona_mes UNIQUE (id_persona, mes)</code></td></tr>
+        <tr><td>RN_013 El porcentaje de alerta está entre 1 y 100, y es 80 por omisión.</td><td><code>DEFAULT 80</code> y <code>CHECK (porcentaje_alerta BETWEEN 1 AND 100)</code></td></tr>
+        <tr><td>RN_019 Una tasa de cambio por moneda y fecha.</td><td><code>PRIMARY KEY (codigo_moneda, fecha)</code></td></tr>
+      </tbody>
+    </table></div>
+    <p><code>NOT NULL</code> obliga a registrar el dato; <code>UNIQUE</code> impide que un valor, o una combinación de valores, se repita; <code>CHECK</code> verifica una condición sobre los valores de la fila. MySQL aplica las restricciones <code>CHECK</code> desde la versión 8.0.16.</p>
+    <p>Algunas reglas comparan datos de varias tablas, como la RN_011, que pide que las dos cuentas de un traslado sean de la misma persona. Esas reglas se verifican en la aplicación o con disparadores (triggers), un tema que va más allá de esta sesión.</p>
+
+  </section>
+
+  <section class="slide" data-id="alter" data-section="Las restricciones">
+    <p class="eyebrow">Las restricciones</p>
+    <h2>Modificar una tabla con ALTER TABLE</h2>
+    
+    <div class="mapa"><div class="grupo on"><b>DDL · Definición de datos</b><small>Crea y modifica la estructura.</small><span class="chip">CREATE</span><span class="chip on">ALTER</span><span class="chip on">DROP</span></div><div class="grupo"><b>DML · Manipulación de datos</b><small>Agrega, cambia, elimina y consulta los datos.</small><span class="chip">INSERT</span><span class="chip">UPDATE</span><span class="chip">DELETE</span><span class="chip">SELECT</span></div><div class="grupo"><b>DCL · Control de acceso</b><small>Otorga y retira permisos.</small><span class="chip">GRANT</span><span class="chip">REVOKE</span></div></div>
+    <p>Las restricciones se pueden declarar al crear la tabla o agregar después con <code>ALTER TABLE</code>, que modifica la estructura de una tabla que ya existe:</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code6">Copiar</button><pre class="code" id="code6"><code><span class="cm">-- Agregar una restricción UNIQUE</span>
+<span class="kw">ALTER TABLE</span> persona <span class="kw">ADD</span> <span class="kw">CONSTRAINT</span> uq_persona_correo <span class="kw">UNIQUE</span> (correo);
+
+<span class="cm">-- Volver obligatoria una columna</span>
+<span class="kw">ALTER TABLE</span> persona <span class="kw">MODIFY</span> celular <span class="ty">VARCHAR</span>(15) <span class="kw">NOT NULL</span>;
+
+<span class="cm">-- Agregar una restricción CHECK</span>
+<span class="kw">ALTER TABLE</span> movimiento <span class="kw">ADD</span> <span class="kw">CONSTRAINT</span> ck_movimiento_valor <span class="kw">CHECK</span> (valor &gt; 0);
+
+<span class="cm">-- Agregar una columna con su llave foránea</span>
+<span class="kw">ALTER TABLE</span> cuenta <span class="kw">ADD COLUMN</span> id_entidad <span class="ty">INT UNSIGNED</span> <span class="kw">NULL</span>;
+<span class="kw">ALTER TABLE</span> cuenta <span class="kw">ADD</span> <span class="kw">CONSTRAINT</span> fk_cuenta_entidad <span class="kw">FOREIGN KEY</span> (id_entidad)
+  <span class="kw">REFERENCES</span> entidad_financiera (id_entidad) <span class="kw">ON DELETE</span> <span class="kw">SET NULL</span>;</code></pre></div>
+    <p>Si la tabla ya tiene datos que incumplen la restricción, por ejemplo personas sin celular, MySQL no la agrega hasta que esos datos se corrijan. Para eliminar una tabla completa, con su estructura y sus datos, se usa <code>DROP TABLE</code>; para eliminar la base de datos completa, <code>DROP DATABASE</code>. Por eso los scripts de creación suelen empezar con <code>DROP DATABASE IF EXISTS</code>, que permite volver a ejecutarlos desde cero.</p>
+
+  </section>
+
+  <section class="slide" data-id="insert" data-section="La manipulación de datos">
+    <p class="eyebrow">La manipulación de datos</p>
+    <h2>Agregar registros con INSERT</h2>
+    
+    <div class="mapa"><div class="grupo"><b>DDL · Definición de datos</b><small>Crea y modifica la estructura.</small><span class="chip">CREATE</span><span class="chip">ALTER</span><span class="chip">DROP</span></div><div class="grupo on"><b>DML · Manipulación de datos</b><small>Agrega, cambia, elimina y consulta los datos.</small><span class="chip on">INSERT</span><span class="chip">UPDATE</span><span class="chip">DELETE</span><span class="chip">SELECT</span></div><div class="grupo"><b>DCL · Control de acceso</b><small>Otorga y retira permisos.</small><span class="chip">GRANT</span><span class="chip">REVOKE</span></div></div>
+    <p><code>INSERT INTO</code> agrega registros a una tabla. Se puede escribir de dos formas:</p>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code7">Copiar</button><pre class="code" id="code7"><code><span class="cm">-- Sin nombrar las columnas: los valores van en el orden en que se definieron en la tabla</span>
+<span class="kw">INSERT INTO</span> moneda <span class="kw">VALUES</span> (<span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Peso colombiano&#x27;</span>);
+
+<span class="cm">-- Nombrando las columnas: los valores van en el orden de la sentencia</span>
+<span class="kw">INSERT INTO</span> persona (id_ciudad, nombres, apellidos, correo, celular, fecha_registro)
+<span class="kw">VALUES</span> (1, <span class="st">&#x27;Sofía&#x27;</span>, <span class="st">&#x27;Ramírez Gómez&#x27;</span>, <span class="st">&#x27;sofia.r@correo.com&#x27;</span>, <span class="st">&#x27;3001234567&#x27;</span>, <span class="st">&#x27;2026-08-01&#x27;</span>);</code></pre></div>
+    <p>La segunda forma es la recomendada: el script se entiende mejor, y las columnas que no se nombran toman su valor por omisión o quedan vacías. Por eso no se escribe <em>id_persona</em>: MySQL lo asigna con <code>AUTO_INCREMENT</code>.</p>
+    <p>Los textos y las fechas van entre comillas simples, y las fechas en el formato 'AAAA-MM-DD'. Los números se escriben sin separador de miles y con punto decimal: 1200000 o 28.50. Para dejar un dato vacío se escribe <code>NULL</code>, sin comillas. Una misma sentencia puede agregar varios registros, separando cada grupo de valores con una coma.</p>
+
+  </section>
+
+  <section class="slide" data-id="insert-fk" data-section="La manipulación de datos">
+    <p class="eyebrow">La manipulación de datos</p>
+    <h2>INSERT y las llaves foráneas</h2>
+    
+    <p>Cuando una tabla tiene llaves foráneas obligatorias, el registro al que hacen referencia debe existir antes. Por eso las tablas se pueblan en el mismo orden en que se crearon. Si se intenta registrar una cuenta para una persona que no existe:</p>
+    <div class="code-wrap"><pre class="code" id="code8"><code><span class="kw">INSERT INTO</span> cuenta (id_persona, id_tipo_cuenta, codigo_moneda, nombre, fecha_saldo_inicial)
+<span class="kw">VALUES</span> (9, 1, <span class="st">&#x27;COP&#x27;</span>, <span class="st">&#x27;Cuenta nueva&#x27;</span>, <span class="st">&#x27;2026-11-01&#x27;</span>);</code></pre></div>
+    <div class="sqlerror"><strong>Respuesta de MySQL:</strong> ERROR 1452 (23000): Cannot add or update a child row: a foreign key constraint fails (`mi_plata_en_orden`.`cuenta`, CONSTRAINT `fk_cuenta_persona` FOREIGN KEY (`id_persona`) REFERENCES `persona` (`id_persona`) ON DELETE RESTRICT ON UPDATE CASCADE)</div>
+    <p>Las restricciones también se verifican en cada INSERT. Un movimiento con valor cero o una persona con un correo que ya existe son rechazados:</p>
+    <div class="code-wrap"><pre class="code" id="code9"><code><span class="kw">INSERT INTO</span> movimiento (id_cuenta, id_categoria, fecha_ocurrencia, valor, descripcion)
+<span class="kw">VALUES</span> (1, 5, <span class="st">&#x27;2026-11-05&#x27;</span>, 0, <span class="st">&#x27;Mercado&#x27;</span>);</code></pre></div>
+    <div class="sqlerror"><strong>Respuesta de MySQL:</strong> ERROR 3819 (HY000): Check constraint &#x27;ck_movimiento_valor&#x27; is violated.</div>
+    <p>El nombre de la restricción en el mensaje indica cuál regla se incumplió; esa es la utilidad de nombrarlas.</p>
+
+  </section>
+
+  <section class="slide" data-id="update" data-section="La manipulación de datos">
+    <p class="eyebrow">La manipulación de datos</p>
+    <h2>Actualizar registros con UPDATE</h2>
+    
+    <div class="mapa"><div class="grupo"><b>DDL · Definición de datos</b><small>Crea y modifica la estructura.</small><span class="chip">CREATE</span><span class="chip">ALTER</span><span class="chip">DROP</span></div><div class="grupo on"><b>DML · Manipulación de datos</b><small>Agrega, cambia, elimina y consulta los datos.</small><span class="chip">INSERT</span><span class="chip on">UPDATE</span><span class="chip">DELETE</span><span class="chip">SELECT</span></div><div class="grupo"><b>DCL · Control de acceso</b><small>Otorga y retira permisos.</small><span class="chip">GRANT</span><span class="chip">REVOKE</span></div></div>
+    <p><code>UPDATE</code> cambia los valores de una o varias columnas en los registros que cumplen la condición del <code>WHERE</code>:</p>
+    <div class="code-wrap"><pre class="code" id="code10"><code><span class="kw">UPDATE</span> nombre_tabla
+<span class="kw">SET</span> columna1 = valor1, columna2 = valor2
+<span class="kw">WHERE</span> condicion;</code></pre></div>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code11">Copiar</button><pre class="code" id="code11"><code><span class="cm">-- Sofía cambia su correo</span>
+<span class="kw">UPDATE</span> persona
+<span class="kw">SET</span> correo = <span class="st">&#x27;sofia.ramirez@correo.com&#x27;</span>
+<span class="kw">WHERE</span> id_persona = 1;
+
+<span class="cm">-- Sofía paga la segunda cuota de la nevera</span>
+<span class="kw">UPDATE</span> cuota
+<span class="kw">SET</span> estado = <span class="st">&#x27;pagada&#x27;</span>
+<span class="kw">WHERE</span> id_movimiento = 9 <span class="kw">AND</span> numero = 2;</code></pre></div>
+    <p>La condición del <code>WHERE</code> define cuáles registros se modifican, así que conviene escribirla con cuidado y, cuando sea posible, usar la llave primaria. Sin <code>WHERE</code>, la sentencia se aplica a todos los registros de la tabla. En la tabla persona, un <code>UPDATE persona SET correo = 'nuevo@correo.com';</code> sin condición intentaría dejar a todas las personas con el mismo correo, y la restricción <code>UNIQUE</code> del correo lo impide:</p>
+    <div class="sqlerror"><strong>Respuesta de MySQL:</strong> ERROR 1062 (23000): Duplicate entry &#x27;nuevo@correo.com&#x27; for key &#x27;persona.uq_persona_correo&#x27;</div>
+
+  </section>
+
+  <section class="slide" data-id="delete" data-section="La manipulación de datos">
+    <p class="eyebrow">La manipulación de datos</p>
+    <h2>Eliminar registros con DELETE</h2>
+    
+    <div class="mapa"><div class="grupo"><b>DDL · Definición de datos</b><small>Crea y modifica la estructura.</small><span class="chip">CREATE</span><span class="chip">ALTER</span><span class="chip">DROP</span></div><div class="grupo on"><b>DML · Manipulación de datos</b><small>Agrega, cambia, elimina y consulta los datos.</small><span class="chip">INSERT</span><span class="chip">UPDATE</span><span class="chip on">DELETE</span><span class="chip">SELECT</span></div><div class="grupo"><b>DCL · Control de acceso</b><small>Otorga y retira permisos.</small><span class="chip">GRANT</span><span class="chip">REVOKE</span></div></div>
+    <p><code>DELETE FROM</code> elimina los registros que cumplen la condición del <code>WHERE</code>. Como en el UPDATE, sin condición se eliminan todos los registros de la tabla.</p>
+    <div class="code-wrap"><pre class="code" id="code12"><code><span class="kw">DELETE FROM</span> nombre_tabla
+<span class="kw">WHERE</span> condicion;</code></pre></div>
+    <p>Al eliminar, MySQL aplica la acción que definimos en cada llave foránea:</p>
+    <div class="code-wrap"><pre class="code" id="code13"><code><span class="cm">-- RESTRICT: la categoría Mercado tiene movimientos</span>
+<span class="kw">DELETE FROM</span> categoria <span class="kw">WHERE</span> id_categoria = 5;</code></pre></div>
+    <div class="sqlerror"><strong>Respuesta de MySQL:</strong> ERROR 1451 (23000): Cannot delete or update a parent row: a foreign key constraint fails (`mi_plata_en_orden`.`movimiento`, CONSTRAINT `fk_movimiento_categoria` ...)</div>
+    <div class="code-wrap"><pre class="code" id="code14"><code><span class="cm">-- CASCADE: al eliminar la compra de la nevera se eliminan también sus tres cuotas</span>
+<span class="kw">DELETE FROM</span> movimiento <span class="kw">WHERE</span> id_movimiento = 9;
+
+<span class="cm">-- SET NULL: al eliminar el supermercado, sus movimientos se conservan sin tercero</span>
+<span class="kw">DELETE FROM</span> tercero <span class="kw">WHERE</span> id_tercero = 1;</code></pre></div>
+    <p>Antes de eliminar, vale la pena consultar con un SELECT y la misma condición cuáles registros se van a eliminar.</p>
+
+  </section>
+
+  <section class="slide" data-id="select" data-section="La manipulación de datos">
+    <p class="eyebrow">La manipulación de datos</p>
+    <h2>Consultar con SELECT</h2>
+    
+    <div class="mapa"><div class="grupo"><b>DDL · Definición de datos</b><small>Crea y modifica la estructura.</small><span class="chip">CREATE</span><span class="chip">ALTER</span><span class="chip">DROP</span></div><div class="grupo on"><b>DML · Manipulación de datos</b><small>Agrega, cambia, elimina y consulta los datos.</small><span class="chip">INSERT</span><span class="chip">UPDATE</span><span class="chip">DELETE</span><span class="chip on">SELECT</span></div><div class="grupo"><b>DCL · Control de acceso</b><small>Otorga y retira permisos.</small><span class="chip">GRANT</span><span class="chip">REVOKE</span></div></div>
+    <p><code>SELECT</code> consulta los datos: indica qué columnas mostrar, de qué tabla y, con <code>WHERE</code>, cuáles registros. El asterisco muestra todas las columnas, y sin <code>WHERE</code> se muestran todos los registros.</p>
+    <div class="code-wrap"><pre class="code" id="code15"><code><span class="kw">SELECT</span> columna1, columna2
+<span class="kw">FROM</span> nombre_tabla
+<span class="kw">WHERE</span> condicion;
+
+<span class="cm">-- Todas las columnas y todos los registros</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> persona;</code></pre></div>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code16">Copiar</button><pre class="code" id="code16"><code><span class="cm">-- Cuentas activas de Sofía</span>
+<span class="kw">SELECT</span> nombre, saldo_inicial, estado
+<span class="kw">FROM</span> cuenta
+<span class="kw">WHERE</span> id_persona = 1 <span class="kw">AND</span> estado = <span class="st">&#x27;activa&#x27;</span>;</code></pre></div>
+    <div class="table-wrap"><table class="datos resultado"><thead><tr><th>nombre</th><th>saldo_inicial</th><th>estado</th></tr></thead><tbody><tr><td>Ahorro para el viaje</td><td>0.00</td><td>activa</td></tr><tr><td>Ahorros de la casa</td><td>2500000.00</td><td>activa</td></tr><tr><td>Billetera</td><td>80000.00</td><td>activa</td></tr><tr><td>Efectivo</td><td>150000.00</td><td>activa</td></tr><tr><td>Tarjeta del supermercado</td><td>0.00</td><td>activa</td></tr></tbody></table></div>
+    <div class="code-wrap"><button type="button" class="copy" data-copy="code17">Copiar</button><pre class="code" id="code17"><code><span class="cm">-- Movimientos de más de 500.000 pesos</span>
+<span class="kw">SELECT</span> id_movimiento, descripcion, valor
+<span class="kw">FROM</span> movimiento
+<span class="kw">WHERE</span> valor &gt; 500000;</code></pre></div>
+    <div class="table-wrap"><table class="datos resultado"><thead><tr><th>id_movimiento</th><th>descripcion</th><th>valor</th></tr></thead><tbody><tr><td>1</td><td>Salario de septiembre</td><td>4800000.00</td></tr><tr><td>2</td><td>Arriendo de octubre</td><td>1200000.00</td></tr><tr><td>7</td><td>Tiquetes aéreos</td><td>640000.00</td></tr><tr><td>8</td><td>Hotel</td><td>900000.00</td></tr></tbody></table></div>
+    <p>En la condición se usan los operadores de comparación (<code>=</code>, <code>&lt;&gt;</code>, <code>&gt;</code>, <code>&lt;</code>, <code>&gt;=</code>, <code>&lt;=</code>), los conectores <code>AND</code> y <code>OR</code>, <code>BETWEEN</code> para rangos, <code>IN</code> para listas de valores e <code>IS NULL</code> para los datos vacíos: las cuentas sin entidad financiera se consultan con <code>WHERE id_entidad IS NULL</code>.</p>
+
+  </section>
+
+  <section class="slide" data-id="taller" data-section="El taller">
+    <p class="eyebrow">El taller</p>
+    <h2>Ahora ustedes: el taller del modelo físico</h2>
+    
+    <p>Les propongo aplicar lo que vimos en un taller en grupo: construir en MySQL una parte del modelo físico de Mi plata en orden a partir del modelo lógico normalizado de Julián, poblar las tablas y practicar las sentencias de manipulación de datos.</p>
+    <p>En la página del taller encuentran el modelo de partida, las tareas, unas preguntas para revisar el script y una estructura sugerida para organizarlo.</p>
+    <p><a class="button primary" href="https://dacocursos-eng.github.io/basesdedatos/mi-plata-en-orden/taller_fisico.html" target="_blank" rel="noopener">Ir al taller del modelo físico</a></p>
+
+  </section>
+
+  <section class="slide" data-id="cierre" data-section="Cierre">
+    <p class="eyebrow">Cierre</p>
+    <h2>Para continuar</h2>
+    
+    <p>El recorrido de hoy, transformar el modelo lógico en tablas, declarar las llaves y las restricciones, poblar las tablas y consultarlas, es el que van a seguir en la tercera entrega con el modelo de su plataforma de eventos y networking. Les recomiendo construir el script por partes y ejecutarlo completo cada vez que agreguen una tabla, para encontrar los errores a tiempo.</p>
+    <p>Quedo atenta a sus preguntas.</p>
+    <div class="sign"><span class="avatar">DA</span><div><small>Saludos,</small><b>Diana Angélica</b></div></div>
+
+  </section>
+
+</main>
+
+<nav class="controls" aria-label="Navegación de la sesión">
+  <div class="controls-inner">
+    <button type="button" id="prev">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <button type="button" class="primary" id="next">Siguiente</button>
+  </div>
+</nav>
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var prev = document.getElementById('prev');
+  var next = document.getElementById('next');
+  var bar = document.getElementById('bar');
+  var dots = document.getElementById('dots');
+  var sectionName = document.getElementById('sectionName');
+  var current = 0;
+  var KEY = 'sesion-fisico-diapositiva';
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} }
+  };
+  slides.forEach(function(s, i){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', s.querySelector('h1,h2').textContent);
+    b.addEventListener('click', function(){ go(i, true); });
+    dots.appendChild(b);
+  });
+  function go(i, focus){
+    if (i < 0 || i >= slides.length) return;
+    current = i;
+    slides.forEach(function(s, j){ s.hidden = j !== i; });
+    Array.prototype.forEach.call(dots.children, function(d, j){
+      d.classList.toggle('on', j === i);
+      d.classList.toggle('done', j < i);
+      if (j === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    prev.disabled = i === 0;
+    next.disabled = i === slides.length - 1;
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    sectionName.textContent = slides[i].getAttribute('data-section');
+    var id = slides[i].getAttribute('data-id');
+    if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch(e){ location.hash = id; } }
+    store.set(KEY, id);
+    window.scrollTo(0, 0);
+    if (focus) { var h = slides[i].querySelector('h1,h2'); h.setAttribute('tabindex','-1'); h.focus({preventScroll:true}); }
+  }
+  function indexOf(id){
+    for (var i = 0; i < slides.length; i++) if (slides[i].getAttribute('data-id') === id) return i;
+    return -1;
+  }
+  prev.addEventListener('click', function(){ go(current - 1, true); });
+  next.addEventListener('click', function(){ go(current + 1, true); });
+  document.addEventListener('keydown', function(e){
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT')) return;
+    if (e.key === 'ArrowRight') go(current + 1, true);
+    if (e.key === 'ArrowLeft') go(current - 1, true);
+  });
+  window.addEventListener('hashchange', function(){
+    var i = indexOf(location.hash.slice(1));
+    if (i >= 0 && i !== current) go(i, false);
+  });
+  var start = indexOf(location.hash.slice(1));
+  if (start < 0) start = indexOf(store.get(KEY) || '');
+  go(start < 0 ? 0 : start, false);
+
+  var status = document.getElementById('copyStatus');
+  var tpl = document.getElementById('plantilla');
+  var copyBtn = document.getElementById('copyTemplate');
+  if (copyBtn) copyBtn.addEventListener('click', function(){
+    var html = tpl.innerHTML, text = tpl.innerText;
+    function done(){ status.textContent = 'Formato copiado. Péguenlo en su documento.'; }
+    function fallback(){
+      var r = document.createRange(); r.selectNodeContents(tpl);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      var ok = false; try { ok = document.execCommand('copy'); } catch(e){}
+      if (ok) { sel.removeAllRanges(); done(); }
+      else { status.textContent = 'El formato quedó seleccionado; cópienlo con Ctrl+C o Cmd+C.'; }
+    }
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        var item = new ClipboardItem({
+          'text/html': new Blob([html], {type:'text/html'}),
+          'text/plain': new Blob([text], {type:'text/plain'})
+        });
+        navigator.clipboard.write([item]).then(done, fallback);
+      } else { fallback(); }
+    } catch(e){ fallback(); }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  document.querySelectorAll('.copy[data-copy]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var t = document.getElementById(b.getAttribute('data-copy')).innerText;
+      function ok(){ var o = b.textContent; b.textContent = 'Copiado'; setTimeout(function(){ b.textContent = o; }, 1500); }
+      try {
+        if (navigator.clipboard) { navigator.clipboard.writeText(t).then(ok, function(){ sel(); }); } else { sel(); }
+      } catch(e){ sel(); }
+      function sel(){ var r = document.createRange(); r.selectNodeContents(document.getElementById(b.getAttribute('data-copy'))); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = 'Seleccionado: Ctrl+C'; }
+    });
+  });
+})();
+</script>
+</body>
+</html>
